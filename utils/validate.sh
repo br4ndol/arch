@@ -1,17 +1,18 @@
 #!/bin/bash
 set -e
 
-# --- Importar utilidades (para usar msg, error, success) ---
+# --- Importar utilidades ---
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "${SCRIPT_DIR}/utils.sh"
 
-# --- Validar repositorios en pacman.conf ---
+# --- 1. Validar repositorios en pacman.conf ---
 validar_repositorios() {
     local repos=("cachyos" "cachyos-v3" "cachyos-core-v3" "cachyos-extra-v3" "chaotic-aur" "multilib")
     local faltantes=()
 
     for repo in "${repos[@]}"; do
-        if ! grep -q "^\[$repo\]" /etc/pacman.conf; then
+        # Soporta espacios iniciales pero ignora si está comentado con #
+        if ! grep -q "^[[:space:]]*\[$repo\]" /etc/pacman.conf; then
             faltantes+=("$repo")
         fi
     done
@@ -23,5 +24,61 @@ validar_repositorios() {
     success "Todos los repositorios validados correctamente."
 }
 
-# --- EJECUTAR LA VALIDACIÓN ---
+# --- 2. Actualizar mirrors con rate-mirrors ---
+actualizar_mirrors() {
+    msg "Verificando dependencia 'rate-mirrors'..."
+    if ! command -v rate-mirrors &>/dev/null; then
+        msg "Instalando 'rate-mirrors'..."
+        pacman -S --needed --noconfirm rate-mirrors
+    fi
+
+    local ts
+    ts=$(date +%F-%H%M%S)
+    local mirror_files=(
+        /etc/pacman.d/mirrorlist
+        /etc/pacman.d/cachyos-mirrorlist
+        /etc/pacman.d/cachyos-v3-mirrorlist
+        /etc/pacman.d/chaotic-mirrorlist
+    )
+
+    msg "Respaldando listas de mirrors actuales..."
+    for f in "${mirror_files[@]}"; do
+        if [ -f "$f" ]; then
+            cp -a "$f" "$f.bak-$ts"
+        fi
+    done
+
+    msg "Buscando los mejores mirrors para Arch Linux..."
+    if ! rate-mirrors --protocol=https --disable-comments arch > /etc/pacman.d/mirrorlist; then
+        error "Falló la actualización de mirrors para Arch Linux."
+        exit 1
+    fi
+    head -n 5 /etc/pacman.d/mirrorlist
+
+    msg "Buscando los mejores mirrors para CachyOS..."
+    if ! rate-mirrors --protocol=https --disable-comments cachyos > /etc/pacman.d/cachyos-mirrorlist; then
+        error "Falló la actualización de mirrors para CachyOS."
+        exit 1
+    fi
+    head -n 5 /etc/pacman.d/cachyos-mirrorlist
+
+    msg "Generando mirrors para CachyOS-v3..."
+    cp -f /etc/pacman.d/cachyos-mirrorlist /etc/pacman.d/cachyos-v3-mirrorlist
+    sed -i 's|/$arch/|/$arch_v3/|g' /etc/pacman.d/cachyos-v3-mirrorlist
+    head -n 5 /etc/pacman.d/cachyos-v3-mirrorlist
+
+    msg "Buscando los mejores mirrors para Chaotic-AUR..."
+    if ! rate-mirrors --protocol=https --disable-comments chaotic-aur > /etc/pacman.d/chaotic-mirrorlist; then
+        error "Falló la actualización de mirrors para Chaotic-AUR."
+        exit 1
+    fi
+    head -n 5 /etc/pacman.d/chaotic-mirrorlist
+
+    msg "Refrescando bases de datos de pacman (pacman -Syy)..."
+    pacman -Syy
+    success "¡Mirrors actualizados y bases de datos sincronizadas con éxito!"
+}
+
+# --- EJECUCIÓN ---
 validar_repositorios
+actualizar_mirrors
