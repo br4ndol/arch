@@ -29,16 +29,17 @@ paquete_instalado() {
     return $?
 }
 
-# --- Instalar un paquete con pacman ---
+# --- Instalar uno o varios paquetes con pacman ---
 instalar_paquete() {
-    if ! paquete_instalado "$1"; then
-        msg "Instalando paquete: $1..."
-        if ! pacman -S --needed --noconfirm "$1"; then
-            error "Falló la instalación de $1."
-            return 1
-        fi
-        success "Paquete $1 instalado."
-    else
-        msg "El paquete $1 ya está instalado."
+    local pkgs=("$@")
+    if [ ${#pkgs[@]} -eq 0 ]; then
+        return 0
     fi
+
+    msg "Instalando paquete(s): ${pkgs[*]}..."
+    if ! pacman -S --needed --noconfirm "${pkgs[@]}"; then
+        error "Falló la instalación de: ${pkgs[*]}"
+        return 1
+    fi
+    success "Paquete(s) instalado(s) con éxito."
 }
