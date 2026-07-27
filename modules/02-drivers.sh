@@ -48,13 +48,6 @@ PARAMS=(
 # Módulos obligatorios en mkinitcpio.conf
 REQUIRED_MODULES=("i915" "nvidia" "nvidia_modeset" "nvidia_uvm" "nvidia_drm")
 
-# --- 1. Validaciones Previas ---
-# Validar que el repositorio multilib (32-bits) esté habilitado
-if ! grep -q "^\[multilib\]" /etc/pacman.conf; then
-    error "El repositorio [multilib] no está habilitado en /etc/pacman.conf. Es necesario para los paquetes de 32 bits."
-    exit 1
-fi
-
 # --- 2. Instalación de Paquetes ---
 msg "Verificando instalación de controladores gráficos..."
 MISSING_PKGS=()

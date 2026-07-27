@@ -4,6 +4,7 @@ set -e
 # --- Directorios ---
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 MODULES_DIR="${SCRIPT_DIR}/modules"
+VALIDATE_SCRIPT="${SCRIPT_DIR}/utils/validate.sh"
 
 # --- Importar utilidades ---
 source "${SCRIPT_DIR}/utils/utils.sh"
@@ -13,6 +14,11 @@ if [ "$(id -u)" -ne 0 ]; then
     error "Este script debe ejecutarse como root. Usa 'sudo ./setup.sh'."
     exit 1
 fi
+
+# --- Validar repositorios del sistema ---
+msg "Validando repositorios..."
+chmod +x "$VALIDATE_SCRIPT" # Asegura permisos antes de ejecutar
+"$VALIDATE_SCRIPT"
 
 msg "🚀 Iniciando configuración del sistema..."
 
@@ -36,7 +42,6 @@ for module in "${MODULES[@]}"; do
     module_path="${MODULES_DIR}/${module}"
     if [ -f "$module_path" ]; then
         msg "Ejecutando: ${module}..."
-        # Ejecutamos el script directamente respetando su entorno
         if ! "$module_path"; then
             error "El módulo ${module} falló. Deteniendo setup."
             exit 1

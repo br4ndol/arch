@@ -67,12 +67,6 @@ if [ ! -d "/efi" ]; then
     exit 1
 fi
 
-# --- Validar que el repo cachyos-v3 esté habilitado ---
-if ! grep -q "cachyos-v3" /etc/pacman.conf; then
-    error "El repositorio cachyos-v3 no está habilitado en /etc/pacman.conf."
-    exit 1
-fi
-
 # --- 3. Instalación de Paquetes ---
 if [ $kernel_instalado -eq 0 ]; then
     msg "Instalando kernel cachyos-bore y headers..."
