@@ -34,7 +34,7 @@ fi
 # --- Lista de módulos a ejecutar (en orden) ---
 MODULES=(
     "01-kernel.sh"
-    "02-drivers.sh"
+    #"02-drivers.sh"
     "03-plymouth.sh"
 )
 
