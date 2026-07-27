@@ -43,7 +43,7 @@ PACKAGES=(
     "protontricks" "openal" "lib32-openal" "lib32-mpg123" "lib32-gtk3"
     "lib32-ocl-icd" "winetricks"
     # Steam & Gamescope
-    "steam" "steam-devices" "gamescope" "lib32-gamescope" "lib32-vulkan-intel"
+    "steam" "steam-devices" "gamescope" "lib32-gamescope" "lib32-vulkan-intel" "vulkan-intel"
 )
 
 # --- Lista de Flatpaks ---
