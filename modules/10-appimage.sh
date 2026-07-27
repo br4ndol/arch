@@ -2,10 +2,9 @@
 set -e
 
 # =====================================================================
-# Módulo: 10-appimage.sh
-# Descripción: Instala fuse y GearLever (Flatpak), descarga de forma automatizada
-#              las últimas versiones de Obsidian y Ryujinx Canary, las integra
-#              en el sistema y asigna sus fuentes de actualización en GearLever.
+# Módulo: 10-appimages.sh
+# Descripción: Instala Gearlever (Flatpak), descarga las versiones más
+#              recientes de Obsidian (x86_64) y Ryujinx Canary, y las integra.
 # =====================================================================
 
 # --- Importar utilidades ---
@@ -14,7 +13,7 @@ source "${SCRIPT_DIR}/../utils/utils.sh"
 
 # --- Validar que se ejecute como root ---
 if [ "$(id -u)" -ne 0 ]; then
-    error "Este módulo debe ejecutarse como root. Usa 'sudo ./10-appimage.sh'."
+    error "Este módulo debe ejecutarse como root. Usa 'sudo ./10-appimages.sh'."
     exit 1
 fi
 
@@ -30,99 +29,99 @@ if [ -z "$TARGET_USER" ]; then
 fi
 
 TARGET_HOME=$(getent passwd "$TARGET_USER" | cut -d: -f6)
-TARGET_UID=$(id -u "$TARGET_USER")
-XDG_RUNTIME="/run/user/$TARGET_UID"
-
-# Función auxiliar para ejecutar flatpak como usuario objetivo con entorno XDG correcto
-run_gearlever() {
-    runuser -u "$TARGET_USER" -- env XDG_RUNTIME_DIR="$XDG_RUNTIME" flatpak run it.mijorus.gearlever "$@"
-}
+TEMP_DIR="/tmp/appimages_installer"
 
 # --- 1. Instalación de Dependencias ---
-msg "Verificando instalación de 'fuse' y 'GearLever'..."
-if ! paquete_instalado "fuse2" && ! paquete_instalado "fuse3" && ! paquete_instalado "fuse"; then
-    instalar_paquete "fuse3"
-fi
-
+msg "Verificando dependencias necesarias (fuse, jq, Gearlever)..."
+instalar_paquete "fuse3" "jq" "curl"
 instalar_flatpak "it.mijorus.gearlever"
 
-# --- 2. Verificar aplicaciones ya integradas ---
-msg "Verificando AppImages integradas en GearLever..."
-INSTALLED_APPS=""
-if [ -d "$XDG_RUNTIME" ]; then
-    INSTALLED_APPS=$(run_gearlever --list-installed 2>/dev/null || true)
-fi
+# --- Función auxiliar: Consultar aplicaciones integradas en Gearlever ---
+gearlever_installed_apps() {
+    runuser -u "$TARGET_USER" -- flatpak run it.mijorus.gearlever --list-installed 2>/dev/null || true
+}
 
-# --- 3. Integración de Obsidian ---
-if echo "$INSTALLED_APPS" | grep -i -q "Obsidian"; then
-    msg "Obsidian ya está integrado en GearLever."
+INSTALLED_APPS=$(gearlever_installed_apps)
+
+# Preparar directorio temporal
+mkdir -p "$TEMP_DIR"
+chown "$TARGET_USER:$TARGET_USER" "$TEMP_DIR"
+
+# --- 2. Integración de Obsidian ---
+msg "Verificando estado de Obsidian AppImage..."
+if echo "$INSTALLED_APPS" | grep -i "obsidian" &>/dev/null; then
+    msg "Obsidian ya está integrado en Gearlever."
 else
-    msg "Obteniendo la última versión de Obsidian desde GitHub..."
-    OBSIDIAN_URL=$(curl -s https://api.github.com/repos/obsidianmd/obsidian-releases/releases/latest | grep -i "browser_download_url" | grep -i "Obsidian-.*\.AppImage" | cut -d '"' -f 4 | head -n 1)
+    msg "Obteniendo la última versión x86_64 de Obsidian..."
+    
+    # Método 1: API de GitHub (usando operadores seguros ?)
+    OBSIDIAN_URL=$(curl -s https://api.github.com/repos/obsidianmd/obsidian-releases/releases/latest | jq -r '.assets[]? | select(.name? | test("Obsidian-[0-9.]+\\.AppImage$")) | .browser_download_url' 2>/dev/null | head -n 1 || true)
 
-    if [ -n "$OBSIDIAN_URL" ]; then
-        TMP_OBSIDIAN="/tmp/Obsidian.AppImage"
-        msg "Descargando Obsidian AppImage..."
-        curl -sL "$OBSIDIAN_URL" -o "$TMP_OBSIDIAN"
-        chmod +x "$TMP_OBSIDIAN"
-        chown "$TARGET_USER:$TARGET_USER" "$TMP_OBSIDIAN"
-
-        msg "Integrando Obsidian en GearLever..."
-        echo "y" | run_gearlever --integrate "$TMP_OBSIDIAN" || true
-
-        # Buscar el archivo integrado en ~/AppImages o ~/.local/share/gearlever
-        INTEGRATED_FILE=$(find "$TARGET_HOME/AppImages" "$TARGET_HOME/.local/share/gearlever" -iname "*obsidian*.appimage" 2>/dev/null | head -n 1)
-
-        if [ -n "$INTEGRATED_FILE" ]; then
-            msg "Configurando fuente de actualización de GitHub para Obsidian..."
-            run_gearlever --set-update-source "$INTEGRATED_FILE" --manager GithubUpdater repo=obsidianmd/obsidian-releases repo_filename="Obsidian-*.AppImage" || true
-            success "Obsidian configurado correctamente."
+    # Método 2: Fallback vía HTML si la API falló o dio rate limit
+    if [ -z "$OBSIDIAN_URL" ] || [ "$OBSIDIAN_URL" = "null" ]; then
+        msg "API de GitHub no disponible. Usando respaldo mediante búsqueda en la página oficial..."
+        REL_URL=$(curl -sL https://github.com/obsidianmd/obsidian-releases/releases/latest | grep -oP 'href="\K/obsidianmd/obsidian-releases/releases/download/[^"]*Obsidian-[0-9.]+\.AppImage' | head -n 1 || true)
+        if [ -n "$REL_URL" ]; then
+            OBSIDIAN_URL="https://github.com${REL_URL}"
         fi
+    fi
 
-        rm -f "$TMP_OBSIDIAN"
+    if [ -n "$OBSIDIAN_URL" ] && [ "$OBSIDIAN_URL" != "null" ]; then
+        FILE_NAME=$(basename "$OBSIDIAN_URL")
+        DEST_FILE="${TEMP_DIR}/${FILE_NAME}"
+
+        msg "Descargando $FILE_NAME desde: $OBSIDIAN_URL"
+        runuser -u "$TARGET_USER" -- curl -sL "$OBSIDIAN_URL" -o "$DEST_FILE"
+        chmod +x "$DEST_FILE"
+
+        msg "Integrando Obsidian en Gearlever..."
+        echo "y" | runuser -u "$TARGET_USER" -- flatpak run it.mijorus.gearlever --integrate "$DEST_FILE" || true
+        rm -f "$DEST_FILE"
+        success "Obsidian integrado correctamente."
     else
-        error "No se pudo obtener la URL de descarga para Obsidian."
+        error "No se pudo obtener el enlace de descarga para Obsidian x86_64."
+        exit 1
     fi
 fi
 
-# --- 4. Integración de Ryujinx Canary ---
-if echo "$INSTALLED_APPS" | grep -i -q "Ryujinx"; then
-    msg "Ryujinx Canary ya está integrado en GearLever."
+# --- 3. Integración de Ryujinx Canary ---
+msg "Verificando estado de Ryujinx Canary AppImage..."
+if echo "$INSTALLED_APPS" | grep -i "ryujinx" &>/dev/null; then
+    msg "Ryujinx Canary ya está integrado en Gearlever."
 else
     msg "Obteniendo la última versión de Ryujinx Canary desde Forgejo..."
-    RYUJINX_URL=$(curl -s https://git.ryujinx.app/api/v1/repos/Ryubing/Canary/releases/latest | grep -o 'https://[^"]*ryujinx-canary-[^"]*-x64\.AppImage' | head -n 1)
+    
+    # Método 1: API de Forgejo
+    RYUJINX_URL=$(curl -s https://git.ryujinx.app/api/v1/repos/Ryubing/Canary/releases | jq -r '.[0]?.assets[]? | select(.name? | test("ryujinx-canary-.*-x64\\.AppImage$")) | .browser_download_url' 2>/dev/null | head -n 1 || true)
 
-    # Fallback a scraping HTML en caso de que la API requiera autorización
-    if [ -z "$RYUJINX_URL" ]; then
-        REL_PATH=$(curl -s https://git.ryujinx.app/Ryubing/Canary/releases | grep -o '/Ryubing/Canary/releases/download/[^"]*ryujinx-canary-[^"]*-x64\.AppImage' | head -n 1)
-        if [ -n "$REL_PATH" ]; then
-            RYUJINX_URL="https://git.ryujinx.app${REL_PATH}"
+    # Método 2: Fallback vía HTML
+    if [ -z "$RYUJINX_URL" ] || [ "$RYUJINX_URL" = "null" ]; then
+        msg "API de Forgejo no disponible. Usando respaldo vía HTML..."
+        REL_URL=$(curl -s https://git.ryujinx.app/Ryubing/Canary/releases | grep -oP 'href="\K/Ryubing/Canary/releases/download/[^"]*ryujinx-canary-[^"]*-x64\.AppImage' | head -n 1 || true)
+        if [ -n "$REL_URL" ]; then
+            RYUJINX_URL="https://git.ryujinx.app${REL_URL}"
         fi
     fi
 
-    if [ -n "$RYUJINX_URL" ]; then
-        TMP_RYUJINX="/tmp/Ryujinx.AppImage"
-        msg "Descargando Ryujinx Canary AppImage..."
-        curl -sL "$RYUJINX_URL" -o "$TMP_RYUJINX"
-        chmod +x "$TMP_RYUJINX"
-        chown "$TARGET_USER:$TARGET_USER" "$TMP_RYUJINX"
+    if [ -n "$RYUJINX_URL" ] && [ "$RYUJINX_URL" != "null" ]; then
+        FILE_NAME=$(basename "$RYUJINX_URL")
+        DEST_FILE="${TEMP_DIR}/${FILE_NAME}"
 
-        msg "Integrando Ryujinx Canary en GearLever..."
-        echo "y" | run_gearlever --integrate "$TMP_RYUJINX" || true
+        msg "Descargando $FILE_NAME desde: $RYUJINX_URL"
+        runuser -u "$TARGET_USER" -- curl -sL "$RYUJINX_URL" -o "$DEST_FILE"
+        chmod +x "$DEST_FILE"
 
-        # Buscar el archivo integrado
-        INTEGRATED_RYU=$(find "$TARGET_HOME/AppImages" "$TARGET_HOME/.local/share/gearlever" -iname "*ryujinx*.appimage" 2>/dev/null | head -n 1)
-
-        if [ -n "$INTEGRATED_RYU" ]; then
-            msg "Configurando fuente de actualización de Forgejo para Ryujinx Canary..."
-            run_gearlever --set-update-source "$INTEGRATED_RYU" --manager ForgejoUpdater repo_url="https://git.ryujinx.app/Ryubing/Canary" repo_filename="ryujinx-canary-*-x64.AppImage" || true
-            success "Ryujinx Canary configurado correctamente."
-        fi
-
-        rm -f "$TMP_RYUJINX"
+        msg "Integrando Ryujinx Canary en Gearlever..."
+        echo "y" | runuser -u "$TARGET_USER" -- flatpak run it.mijorus.gearlever --integrate "$DEST_FILE" || true
+        rm -f "$DEST_FILE"
+        success "Ryujinx Canary integrado correctamente."
     else
-        error "No se pudo obtener la URL de descarga para Ryujinx Canary."
+        error "No se pudo obtener el enlace de descarga para Ryujinx Canary."
+        exit 1
     fi
 fi
 
-success "🎉 ¡Módulo de AppImages y GearLever completado con éxito!"
+# --- Limpieza final ---
+rm -rf "$TEMP_DIR"
+
+success "🎉 ¡Módulo de AppImages completado con éxito!"
