@@ -1,0 +1,55 @@
+[[ $- != *i* ]] && return
+
+alias inkscape='flatpak run org.inkscape.Inkscape'
+alias p='paru'
+alias boo='ghostty +boo'
+
+[[ -r ~/.config/zsh/config.zsh ]] && source ~/.config/zsh/config.zsh
+
+# ---------- Fastfetch ----------
+if [[ -z "$SSH_CONNECTION" ]] && (( $+commands[fastfetch] )); then
+  fastfetch
+fi
+
+# ---------- Mirrors ----------
+mirror-update() {
+    sudo -v || return
+
+    local ts f
+    ts=$(date +%F-%H%M%S)
+
+    local mirror_files=(
+        /etc/pacman.d/mirrorlist
+        /etc/pacman.d/cachyos-mirrorlist
+        /etc/pacman.d/cachyos-v3-mirrorlist
+        /etc/pacman.d/chaotic-mirrorlist
+    )
+
+    echo ":: Backing up current mirrorlists"
+    for f in "${mirror_files[@]}"; do
+        [[ -f "$f" ]] && sudo cp -a "$f" "$f.bak-$ts"
+    done
+
+    echo ":: Searching for the best Arch Linux mirrors"
+    rate-mirrors --protocol=https --disable-comments arch \
+        | sudo tee /etc/pacman.d/mirrorlist >/dev/null || return
+    head -n 5 /etc/pacman.d/mirrorlist
+
+    echo ":: Searching for the best CachyOS mirrors"
+    rate-mirrors --protocol=https --disable-comments cachyos \
+        | sudo tee /etc/pacman.d/cachyos-mirrorlist >/dev/null || return
+    head -n 5 /etc/pacman.d/cachyos-mirrorlist
+
+    echo ":: Copying mirrors to CachyOS-v3"
+    sudo cp -f /etc/pacman.d/cachyos-mirrorlist /etc/pacman.d/cachyos-v3-mirrorlist || return
+    sudo sed -i 's|/$arch/|/$arch_v3/|g' /etc/pacman.d/cachyos-v3-mirrorlist || return
+    head -n 5 /etc/pacman.d/cachyos-v3-mirrorlist
+
+    echo ":: Searching for the best Chaotic-AUR mirrors"
+    rate-mirrors --protocol=https --disable-comments chaotic-aur \
+        | sudo tee /etc/pacman.d/chaotic-mirrorlist >/dev/null || return
+    head -n 5 /etc/pacman.d/chaotic-mirrorlist
+
+    echo ":: Refreshing package databases"
+    sudo pacman -Syy
+}
