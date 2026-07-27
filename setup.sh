@@ -42,6 +42,7 @@ MODULES=(
     "06-networkmanager.sh"
     "07-audio.sh"
     "08-zram.sh"
+    "09-gaming.sh"
 )
 
 # --- Ejecutar módulos ---
