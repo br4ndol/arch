@@ -43,6 +43,7 @@ MODULES=(
     "07-audio.sh"
     "08-zram.sh"
     "09-gaming.sh"
+    "10-appimage.sh"
 )
 
 # --- Ejecutar módulos ---
