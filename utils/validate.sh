@@ -5,6 +5,20 @@ set -e
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "${SCRIPT_DIR}/utils.sh"
 
+# --- Función auxiliar para ejecutar rate-mirrors sin root ---
+run_rate_mirrors() {
+    local target="$1"
+    local user="${SUDO_USER}"
+
+    # Si no se detecta SUDO_USER o es root, busca el primer usuario normal o usa 'nobody'
+    if [ -z "$user" ] || [ "$user" = "root" ]; then
+        user=$(awk -F: '$3 >= 1000 && $3 < 60000 {print $1; exit}' /etc/passwd)
+        user="${user:-nobody}"
+    fi
+
+    runuser -u "$user" -- rate-mirrors --protocol=https --disable-comments "$target"
+}
+
 # --- 1. Validar repositorios en pacman.conf ---
 validar_repositorios() {
     local repos=("cachyos" "cachyos-v3" "cachyos-core-v3" "cachyos-extra-v3" "chaotic-aur" "multilib")
@@ -49,14 +63,14 @@ actualizar_mirrors() {
     done
 
     msg "Buscando los mejores mirrors para Arch Linux..."
-    if ! rate-mirrors --protocol=https --disable-comments arch > /etc/pacman.d/mirrorlist; then
+    if ! run_rate_mirrors arch > /etc/pacman.d/mirrorlist; then
         error "Falló la actualización de mirrors para Arch Linux."
         exit 1
     fi
     head -n 5 /etc/pacman.d/mirrorlist
 
     msg "Buscando los mejores mirrors para CachyOS..."
-    if ! rate-mirrors --protocol=https --disable-comments cachyos > /etc/pacman.d/cachyos-mirrorlist; then
+    if ! run_rate_mirrors cachyos > /etc/pacman.d/cachyos-mirrorlist; then
         error "Falló la actualización de mirrors para CachyOS."
         exit 1
     fi
@@ -68,7 +82,7 @@ actualizar_mirrors() {
     head -n 5 /etc/pacman.d/cachyos-v3-mirrorlist
 
     msg "Buscando los mejores mirrors para Chaotic-AUR..."
-    if ! rate-mirrors --protocol=https --disable-comments chaotic-aur > /etc/pacman.d/chaotic-mirrorlist; then
+    if ! run_rate_mirrors chaotic-aur > /etc/pacman.d/chaotic-mirrorlist; then
         error "Falló la actualización de mirrors para Chaotic-AUR."
         exit 1
     fi
