@@ -68,16 +68,8 @@ msg "Habilitando servicios de PipeWire a nivel global para usuarios..."
 # Usar --global permite que el servicio quede activo para cualquier sesión de usuario al iniciar
 systemctl --global enable pipewire.socket pipewire-pulse.socket wireplumber.service
 
-
-# --- 4. Instalar EasyEffects vía Flatpak ---
-msg "Verificando e instalando EasyEffects vía Flatpak..."
-if ! flatpak list | grep -q "com.github.wwmm.easyeffects"; then
-    msg "Instalando com.github.wwmm.easyeffects desde Flathub..."
-    instalar_flatpak "com.github.wwmm.easyeffects"
-    success "EasyEffects instalado con éxito."
-else
-    msg "EasyEffects ya está instalado en Flatpak."
-fi
+# --- 4. Instalar EasyEffects (Flatpak) ---
+instalar_flatpak "com.github.wwmm.easyeffects"
 
 # --- 6. Instalar Presets de EasyEffects (JackHack96) ---
 PRESETS_DIR="$TARGET_HOME/.config/easyeffects/output"
