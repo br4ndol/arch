@@ -38,6 +38,7 @@ MODULES=(
     "03-plymouth.sh"
     "04-auth.sh"
     "05-zsh.sh"
+    "06-networkmanager.sh"
 )
 
 # --- Ejecutar módulos ---
