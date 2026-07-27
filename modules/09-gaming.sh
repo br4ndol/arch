@@ -29,7 +29,7 @@ if [ -z "$TARGET_USER" ]; then
 fi
 
 TARGET_HOME=$(getent passwd "$TARGET_USER" | cut -d: -f6)
-CONFIG_SRC="${SCRIPT_DIR}/../configs/gamemode/gamemode.ini"
+CONFIG_SRC="${SCRIPT_DIR}/../configs/gamemode.ini"
 
 # --- Lista de Paquetes Pacman ---
 PACKAGES=(
