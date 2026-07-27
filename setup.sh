@@ -35,6 +35,7 @@ fi
 MODULES=(
     "01-kernel.sh"
     "02-drivers.sh"
+    "03-plymouth.sh"
 )
 
 # --- Ejecutar módulos ---
