@@ -68,20 +68,12 @@ msg "Habilitando servicios de PipeWire a nivel global para usuarios..."
 # Usar --global permite que el servicio quede activo para cualquier sesión de usuario al iniciar
 systemctl --global enable pipewire.socket pipewire-pulse.socket wireplumber.service
 
-# --- 4. Configurar Flatpak y Flathub ---
-msg "Configurando repositorio Flathub en Flatpak..."
-if ! flatpak remotes | grep -q "flathub"; then
-    flatpak remote-add --if-not-exists flathub https://dl.flathub.org/repo/flathub.flatpakrepo
-    success "Repositorio Flathub añadido correctamente."
-else
-    msg "El repositorio Flathub ya estaba configurado."
-fi
 
-# --- 5. Instalar EasyEffects vía Flatpak ---
+# --- 4. Instalar EasyEffects vía Flatpak ---
 msg "Verificando e instalando EasyEffects vía Flatpak..."
 if ! flatpak list | grep -q "com.github.wwmm.easyeffects"; then
     msg "Instalando com.github.wwmm.easyeffects desde Flathub..."
-    flatpak install -y --noninteractive flathub com.github.wwmm.easyeffects
+    instalar_flatpak "com.github.wwmm.easyeffects"
     success "EasyEffects instalado con éxito."
 else
     msg "EasyEffects ya está instalado en Flatpak."

@@ -43,3 +43,29 @@ instalar_paquete() {
     fi
     success "Paquete(s) instalado(s) con éxito."
 }
+
+# --- Instalar uno o varios paquetes con Flatpak ---
+instalar_flatpak() {
+    local pkgs=("$@")
+    if [ ${#pkgs[@]} -eq 0 ]; then
+        return 0
+    fi
+
+    local missing=()
+    for pkg in "${pkgs[@]}"; do
+        if ! flatpak list --system | grep -q "$pkg"; then
+            missing+=("$pkg")
+        fi
+    done
+
+    if [ ${#missing[@]} -gt 0 ]; then
+        msg "Instalando paquete(s) Flatpak: ${missing[*]}..."
+        if ! flatpak install -y flathub "${missing[@]}"; then
+            error "Falló la instalación de Flatpak: ${missing[*]}"
+            return 1
+        fi
+        success "Paquete(s) Flatpak instalado(s) con éxito."
+    else
+        msg "Todos los paquetes Flatpak solicitados ya están instalados."
+    fi
+}
