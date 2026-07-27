@@ -39,6 +39,7 @@ MODULES=(
     "04-auth.sh"
     "05-zsh.sh"
     "06-networkmanager.sh"
+    "07-audio.sh"
 )
 
 # --- Ejecutar módulos ---
