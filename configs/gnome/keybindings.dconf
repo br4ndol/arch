@@ -1,0 +1,61 @@
+[/]
+custom-keybindings=['/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom0/',
+                     '/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom1/',
+                     '/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom2/',
+                     '/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom3/',
+                     '/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom4/',
+                     '/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom5/',
+                     '/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom6/',
+                     '/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom7/',
+                     '/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom8/',
+                     '/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom9/']
+
+[custom-keybindings/custom0]
+name='ROG Control Center'
+command='rog-control-center'
+binding='XF86Launch1'
+
+[custom-keybindings/custom1]
+name='Aura Effect'
+command='asusctl aura effect --next-mode'
+binding='XF86Launch3'
+
+[custom-keybindings/custom2]
+name='Power Plan'
+command='asusctl profile next'
+binding='XF86Launch4'
+
+[custom-keybindings/custom3]
+name='Emoji'
+command='flatpak run it.mijorus.smile'
+binding='<Alt><Super>e'
+
+[custom-keybindings/custom4]
+name='Nautilus'
+command='nautilus'
+binding='<Super>e'
+
+[custom-keybindings/custom5]
+name='Terminal'
+command='ghostty'
+binding='<Super>q'
+
+[custom-keybindings/custom6]
+name='Resources'
+command='flatpak run net.nokyan.Resources'
+binding='<Shift><Control>Escape'
+
+[custom-keybindings/custom7]
+name='Screenshots'
+command='flatpak run be.alexandervanhee.gradia --screenshot=INTERACTIVE'
+binding='<Shift><Super>s'
+
+[custom-keybindings/custom8]
+name='Brightness Up'
+command='ddcutil --bus 13 setvcp 10 + 10'
+binding='<Control>XF86MonBrightnessUp'
+
+[custom-keybindings/custom9]
+name='Brightness Down'
+command='ddcutil --bus 13 setvcp 10 - 10'
+binding='<Control>XF86MonBrightnessDown'

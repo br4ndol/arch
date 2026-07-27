@@ -44,6 +44,7 @@ MODULES=(
     "08-zram.sh"
     "09-gaming.sh"
     "10-appimage.sh"
+    "11-gnome.sh"
 )
 
 # --- Ejecutar módulos ---
