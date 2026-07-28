@@ -46,6 +46,7 @@ MODULES=(
     "10-appimage.sh"
     "11-gnome.sh"
     "12-gnome-extras.sh"
+    "13-finalize.sh"
 )
 
 # --- Ejecutar módulos ---
