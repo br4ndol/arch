@@ -129,12 +129,12 @@ user_gsettings set org.gnome.desktop.interface color-scheme 'prefer-dark'
 msg "Configurando GTK-4.0..."
 GTK4_SETTINGS="$TARGET_HOME/.config/gtk-4.0/settings.ini"
 mkdir -p "$(dirname "$GTK4_SETTINGS")"
-if [ -f "$CONFIG_DIR/gtk-4.0/settings.ini" ]; then
-    cp -f "$CONFIG_DIR/gtk-4.0/settings.ini" "$GTK4_SETTINGS"
+if [ -f "$CONFIG_DIR/settings.ini" ]; then
+    cp -f "$CONFIG_DIR/settings.ini" "$GTK4_SETTINGS"
     chown -R "$TARGET_USER:$TARGET_USER" "$TARGET_HOME/.config/gtk-4.0"
     success "Configuración de GTK-4.0 aplicada."
 else
-    error "No se encontró el archivo de configuración GTK-4.0 en $CONFIG_DIR/gtk-4.0/settings.ini"
+    error "No se encontró el archivo de configuración GTK-4.0 en $CONFIG_DIR/settings.ini"
     exit 1
 fi
 

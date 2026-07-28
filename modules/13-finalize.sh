@@ -25,14 +25,21 @@ success "Caché de pacman limpiada."
 # --- 3. Limpiar caché de AUR (yay/paru) ---
 msg "Limpieza de caché de AUR..."
 TARGET_USER=$(awk -F: '$3 >= 1000 && $3 < 60000 {print $1; exit}' /etc/passwd)
+
+# Esperar 2 segundos para asegurarnos de que no haya procesos de descarga activos
+sleep 2
+
 if command -v yay &>/dev/null; then
-    runuser -u "$TARGET_USER" -- yay -Sc --noconfirm
+    runuser -u "$TARGET_USER" -- yay -Sc --noconfirm 2>/dev/null || {
+        msg "Advertencia: No se pudo limpiar la caché de yay (puede haber procesos de descarga activos)."
+    }
 elif command -v paru &>/dev/null; then
-    runuser -u "$TARGET_USER" -- paru -Sc --noconfirm
+    runuser -u "$TARGET_USER" -- paru -Sc --noconfirm 2>/dev/null || {
+        msg "Advertencia: No se pudo limpiar la caché de paru (puede haber procesos de descarga activos)."
+    }
 else
     msg "No se encontró yay ni paru. Omitiendo limpieza de caché AUR."
 fi
-
 # --- 4. Limpiar archivos temporales ---
 msg "Limpieza de archivos temporales..."
 rm -rf /tmp/* /var/tmp/* 2>/dev/null || true
