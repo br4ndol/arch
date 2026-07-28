@@ -1,0 +1,111 @@
+/*
+Edited by br4ndol
+credits to: https://github.com/HyDE-Project/HyDE/tree/master/Configs/.config/fastfetch
+            https://github.com/Chick2D/neofetch-themes?tab=readme-ov-file
+
+*/
+{
+    "$schema": "https://github.com/fastfetch-cli/fastfetch/raw/dev/doc/json_schema.json",
+    "logo": {
+    "type": "file",        // Logo type: auto, builtin, small, file, etc.
+    "source": "~/.config/fastfetch/logo.txt",      // Built-in logo name or file path
+    "width": null,           // Width in characters (for image logos)
+    "height": null,          // Height in characters (for image logos)
+    "padding": {
+        "top": 2,          // Top padding
+        "left": 2,         // Left padding
+        "right": 2         // Right padding
+    },
+    "color": {             // Override logo colors
+        "1": "blue",
+        "2": "cyan"
+    }
+},
+    "display": {
+      "separator": "  "
+    },
+    "modules": [
+	{
+        "type": "colors",
+        "paddingLeft": 7,
+        "symbol": "star"
+      },
+      {
+        "type": "title",
+        "key": "  ",
+        "format": "{6} {7} {8}"
+      },
+      {
+        "type": "os",
+        "key": "  󰣇",
+        "format": "{2}",
+        "keyColor": "cyan"
+      },
+      {
+        "type": "kernel",
+        "key": "  ",
+        "format": "{1} {2}",
+        "keyColor": "red"
+      },
+      {
+        "type": "shell",
+        "key": "  ",
+        "keyColor": "red"
+      },
+      {
+        "type": "terminal",
+        "key": "  󰊠",
+        "format": "{5}",
+        "keyColor": "blue"
+      },
+      {
+        "type": "packages",
+        "key": "  󰮯",
+        "keyColor": "blue"
+      },
+      {
+        "type": "de",
+        "key": "  ",
+        "format": "{2} {3}",
+        "keyColor": "green"
+      },
+      {
+        "type": "battery",
+        "key": "  󱊣",
+        "format": "{4} {5}",
+        "keyColor": "green"
+      },
+      {
+        "type": "uptime",
+        "key": "  ",
+        "format": "{2}h {3}m",
+        "keyColor": "yellow"
+      },
+      
+      {
+        "type": "cpu",
+        "format": "{1}",
+        "key": "  ",
+        "keyColor": "yellow"
+      },
+      {
+      "type": "gpu",
+      "format": "{1} {2}",
+      "key": "  󰊴",
+      "keyColor": "blue"
+      },
+      {
+        "type": "memory",
+        "key": "  ",
+        "format": "{1} / {2} {3}",
+        "keyColor": "magenta"
+      },
+      {
+	      "type": "swap",
+	      "key": "  󰿡",
+        "format": "{1} / {2} {3}",
+        "keyColor": "magenta"
+      },
+      "break"
+    ]
+  }

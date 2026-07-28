@@ -124,4 +124,53 @@ chown -R "$TARGET_USER:$TARGET_USER" "$TARGET_HOME/.config"
 chown -R "$TARGET_USER:$TARGET_USER" "$TARGET_HOME/.local"
 chown "$TARGET_USER:$TARGET_USER" "$TARGET_HOME/.zshrc"
 
+# --- 6. Copiar configuraciones adicionales (btop, fastfetch, ghostty) ---
+msg "Copiando configuraciones adicionales para $TARGET_USER..."
+
+# btop
+BTOP_CONF_SRC="${SCRIPT_DIR}/../configs/btop.conf"
+BTOP_DIR="$TARGET_HOME/.config/btop"
+mkdir -p "$BTOP_DIR"
+if [ -f "$BTOP_CONF_SRC" ]; then
+    cp -f "$BTOP_CONF_SRC" "$BTOP_DIR/"
+    chown "$TARGET_USER:$TARGET_USER" "$BTOP_DIR/btop.conf"
+    success "Configuración de btop copiada."
+else
+    error "No se encontró el archivo de configuración de btop en $BTOP_CONF_SRC"
+    exit 1
+fi
+
+# fastfetch
+FASTFETCH_DIR="$TARGET_HOME/.config/fastfetch"
+mkdir -p "$FASTFETCH_DIR"
+FASTFETCH_LOGO_SRC="${SCRIPT_DIR}/../configs/fastfetch/logo.txt"
+FASTFETCH_CONFIG_SRC="${SCRIPT_DIR}/../configs/fastfetch/config.jsonc"
+
+if [ -f "$FASTFETCH_LOGO_SRC" ]; then
+    cp -f "$FASTFETCH_LOGO_SRC" "$FASTFETCH_DIR/"
+    chown "$TARGET_USER:$TARGET_USER" "$FASTFETCH_DIR/logo.txt"
+fi
+
+if [ -f "$FASTFETCH_CONFIG_SRC" ]; then
+    cp -f "$FASTFETCH_CONFIG_SRC" "$FASTFETCH_DIR/"
+    chown "$TARGET_USER:$TARGET_USER" "$FASTFETCH_DIR/config.jsonc"
+    success "Configuración de fastfetch copiada."
+else
+    error "No se encontró el archivo de configuración de fastfetch en $FASTFETCH_CONFIG_SRC"
+    exit 1
+fi
+
+# ghostty
+GHOSTTY_CONF_SRC="${SCRIPT_DIR}/../configs/config.ghostty"
+GHOSTTY_DIR="$TARGET_HOME/.config/ghostty"
+mkdir -p "$GHOSTTY_DIR"
+if [ -f "$GHOSTTY_CONF_SRC" ]; then
+    cp -f "$GHOSTTY_CONF_SRC" "$GHOSTTY_DIR/config"
+    chown "$TARGET_USER:$TARGET_USER" "$GHOSTTY_DIR/config"
+    success "Configuración de ghostty copiada."
+else
+    error "No se encontró el archivo de configuración de ghostty en $GHOSTTY_CONF_SRC"
+    exit 1
+fi
+
 success "🎉 ¡Módulo de ZSH completado con éxito!"
