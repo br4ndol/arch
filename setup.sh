@@ -45,6 +45,7 @@ MODULES=(
     "09-gaming.sh"
     "10-appimage.sh"
     "11-gnome.sh"
+    "12-gnome-extras.sh"
 )
 
 # --- Ejecutar módulos ---
