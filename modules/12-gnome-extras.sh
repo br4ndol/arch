@@ -97,7 +97,7 @@ GTK_BOOKMARKS="$TARGET_HOME/.config/gtk-3.0/bookmarks"
 mkdir -p "$(dirname "$GTK_BOOKMARKS")"
 if ! grep -q "file:/// File System" "$GTK_BOOKMARKS"; then
     echo "file:/// File System" >> "$GTK_BOOKMARKS"
-    chown "$TARGET_USER:$TARGET_USER" "$GTK_BOOKMARKS"
+    chown -R "$TARGET_USER:$TARGET_USER" "$TARGET_HOME/.config/gtk-3.0"
     success "Marcador 'File System' añadido."
 else
     msg "Marcador 'File System' ya existe."
@@ -129,12 +129,12 @@ user_gsettings set org.gnome.desktop.interface color-scheme 'prefer-dark'
 msg "Configurando GTK-4.0..."
 GTK4_SETTINGS="$TARGET_HOME/.config/gtk-4.0/settings.ini"
 mkdir -p "$(dirname "$GTK4_SETTINGS")"
-if [ -f "$CONFIG_DIR/settings.ini" ]; then
-    cp -f "$CONFIG_DIR/settings.ini" "$GTK4_SETTINGS"
-    chown "$TARGET_USER:$TARGET_USER" "$GTK4_SETTINGS"
+if [ -f "$CONFIG_DIR/gtk-4.0/settings.ini" ]; then
+    cp -f "$CONFIG_DIR/gtk-4.0/settings.ini" "$GTK4_SETTINGS"
+    chown -R "$TARGET_USER:$TARGET_USER" "$TARGET_HOME/.config/gtk-4.0"
     success "Configuración de GTK-4.0 aplicada."
 else
-    error "No se encontró el archivo de configuración GTK-4.0 en $CONFIG_DIR/settings.ini"
+    error "No se encontró el archivo de configuración GTK-4.0 en $CONFIG_DIR/gtk-4.0/settings.ini"
     exit 1
 fi
 
@@ -189,6 +189,15 @@ if ! grep -q "QT_QPA_PLATFORMTHEME=qt5ct" /etc/environment; then
     success "QT_QPA_PLATFORMTHEME configurado."
 else
     msg "QT_QPA_PLATFORMTHEME ya está configurado."
+fi
+
+# --- Asegurar permisos correctos en ~/.config/ ---
+msg "Asegurando permisos en ~/.config/ para $TARGET_USER..."
+if [ -d "$TARGET_HOME/.config" ]; then
+    chown -R "$TARGET_USER:$TARGET_USER" "$TARGET_HOME/.config"
+    success "Permisos de ~/.config/ corregidos."
+else
+    msg "No existe el directorio ~/.config/ para $TARGET_USER."
 fi
 
 # --- Limpieza ---
