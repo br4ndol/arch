@@ -95,4 +95,4 @@ actualizar_mirrors() {
 
 # --- EJECUCIÓN ---
 validar_repositorios
-#actualizar_mirrors
+actualizar_mirrors
