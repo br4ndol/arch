@@ -35,7 +35,7 @@ fi
 MODULES=(
     "00-tools.sh"
     "01-kernel.sh"
-    #"02-drivers.sh"
+    "02-drivers.sh"
     "03-plymouth.sh"
     "04-auth.sh"
     "05-zsh.sh"
