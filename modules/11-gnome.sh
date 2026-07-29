@@ -41,7 +41,6 @@ PACKAGES=(
     "gnome-shell" "gdm" "gnome-control-center" "gnome-backgrounds"
     "gnome-disk-utility" "gnome-tweaks" "ghostty" "ocean-sound-theme"
     "ddcutil" "noto-fonts" "noto-fonts-cjk" "noto-fonts-emoji" "dbus"
-    "brave-origin-bin"
 )
 
 # --- Lista de Flatpaks ---
