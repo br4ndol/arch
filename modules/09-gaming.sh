@@ -87,19 +87,36 @@ if getent group gamemode &>/dev/null; then
     fi
 fi
 
-# --- 4. Configurar gamemode.ini ---
-msg "Configurando notificación para GameMode..."
-mkdir -p "$TARGET_HOME/.config"
+# --- 4. Configurar GameMode (Scripts y gamemode.ini) ---
+msg "Configurando scripts y archivo de configuración para GameMode..."
+GAMEMODE_TARGET_DIR="$TARGET_HOME/.config/gamemode"
+GAMEMODE_SRC_DIR="${SCRIPT_DIR}/../configs/gamemode"
 
-if [ -f "$CONFIG_SRC" ]; then
-    cp -f "$CONFIG_SRC" "$TARGET_HOME/.config/gamemode.ini"
-    chmod 644 "$TARGET_HOME/.config/gamemode.ini"
-    chown "$TARGET_USER:$TARGET_USER" "$TARGET_HOME/.config/gamemode.ini"
-    success "Archivo gamemode.ini desplegado correctamente."
+mkdir -p "$GAMEMODE_TARGET_DIR"
+
+# Copiar scripts de inicio y fin
+if [ -f "$GAMEMODE_SRC_DIR/gamemode-start.sh" ] && [ -f "$GAMEMODE_SRC_DIR/gamemode-end.sh" ]; then
+    cp -f "$GAMEMODE_SRC_DIR/gamemode-start.sh" "$GAMEMODE_TARGET_DIR/gamemode-start.sh"
+    cp -f "$GAMEMODE_SRC_DIR/gamemode-end.sh" "$GAMEMODE_TARGET_DIR/gamemode-end.sh"
+    
+    # Asignar permisos de ejecución
+    chmod +x "$GAMEMODE_TARGET_DIR/gamemode-start.sh" "$GAMEMODE_TARGET_DIR/gamemode-end.sh"
+    success "Scripts gamemode-start.sh y gamemode-end.sh desplegados con permisos de ejecución."
 else
-    error "No se encontró la plantilla de configuración en $CONFIG_SRC"
+    error "No se encontraron los scripts de GameMode en $GAMEMODE_SRC_DIR"
     exit 1
 fi
+
+# Generar gamemode.ini apuntando a las rutas absolutas del usuario
+cat > "$GAMEMODE_TARGET_DIR/gamemode.ini" <<EOF
+[custom]
+start=$GAMEMODE_TARGET_DIR/gamemode-start.sh
+end=$GAMEMODE_TARGET_DIR/gamemode-end.sh
+EOF
+
+chmod 644 "$GAMEMODE_TARGET_DIR/gamemode.ini"
+chown -R "$TARGET_USER:$TARGET_USER" "$GAMEMODE_TARGET_DIR"
+success "Archivo gamemode.ini configurado correctamente."
 
 # --- 5. Instalación de Flatpaks ---
 msg "Verificando e instalando Flatpaks para juegos..."
