@@ -43,7 +43,7 @@ PACKAGES=(
     "protontricks" "openal" "lib32-openal" "lib32-mpg123" "lib32-gtk3"
     "lib32-ocl-icd" "winetricks"
     # Steam & Gamescope
-    "steam" "steam-devices" "gamescope" "lib32-gamescope" "noto-fonts" "lib32-vulkan-intel" "vulkan-intel"
+    "steam" "steam-devices" "gamescope" "lib32-gamescope" "noto-fonts"
 )
 
 # --- Lista de Flatpaks ---
@@ -123,6 +123,6 @@ success "Archivo gamemode.ini configurado correctamente en $GAMEMODE_INI_FILE."
 
 # --- 5. Instalación de Flatpaks ---
 msg "Verificando e instalando Flatpaks para juegos..."
-#instalar_flatpak "${FLATPAKS[@]}"
+instalar_flatpak "${FLATPAKS[@]}"
 
 success "🎉 ¡Módulo de Juegos y Rendimiento completado con éxito!"

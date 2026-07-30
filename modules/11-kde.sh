@@ -38,6 +38,7 @@ PACKAGES=(
     "dolphin" "kscreen" "kde-gtk-config" "partitionmanager"
     "plasma-pa" "plasma-nm" "bluedevil" "spectacle" "ghostty"
     "ark" "7zip" "unrar" "noto-fonts" "noto-fonts-cjk" "noto-fonts-emoji"
+    "qt6-multimedia-ffmpeg" "tesseract-data-eng" "tesseract-data-spa"
 )
 
 # --- Lista de Flatpaks para KDE ---

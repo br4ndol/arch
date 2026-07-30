@@ -69,23 +69,23 @@ msg "Habilitando servicios de PipeWire a nivel global para usuarios..."
 systemctl --global enable pipewire.socket pipewire-pulse.socket wireplumber.service
 
 # --- 4. Instalar EasyEffects (Flatpak) ---
-#instalar_flatpak "com.github.wwmm.easyeffects"
+instalar_flatpak "com.github.wwmm.easyeffects"
 
 # --- 6. Instalar Presets de EasyEffects (JackHack96) ---
 PRESETS_DIR="$TARGET_HOME/.config/easyeffects/output"
-#msg "Verificando Presets de EasyEffects para $TARGET_USER..."
+msg "Verificando Presets de EasyEffects para $TARGET_USER..."
 
-#if [ ! -d "$PRESETS_DIR" ] || [ -z "$(ls -A "$PRESETS_DIR" 2>/dev/null)" ]; then
-#    msg "Instalando Presets de EasyEffects (Opción 1: Todos)..."
-#    
-#    # Enviamos "1" automáticamente al script interactivo
-#    echo "1" | runuser -u "$TARGET_USER" -- bash -c "$(curl -fsSL https://raw.githubusercontent.com/JackHack96/EasyEffects-Presets/master/install.sh)" || true
-#
-#    # Corregir permisos en caso necesario
-#    chown -R "$TARGET_USER:$TARGET_USER" "$TARGET_HOME/.config/easyeffects" 2>/dev/null || true
-#    success "Presets de EasyEffects instalados con éxito."
-#else
-#    msg "Los Presets de EasyEffects ya están instalados."
-#fi
+if [ ! -d "$PRESETS_DIR" ] || [ -z "$(ls -A "$PRESETS_DIR" 2>/dev/null)" ]; then
+    msg "Instalando Presets de EasyEffects (Opción 1: Todos)..."
+    
+    # Enviamos "1" automáticamente al script interactivo
+    echo "1" | runuser -u "$TARGET_USER" -- bash -c "$(curl -fsSL https://raw.githubusercontent.com/JackHack96/EasyEffects-Presets/master/install.sh)" || true
+
+    # Corregir permisos en caso necesario
+    chown -R "$TARGET_USER:$TARGET_USER" "$TARGET_HOME/.config/easyeffects" 2>/dev/null || true
+    success "Presets de EasyEffects instalados con éxito."
+else
+    msg "Los Presets de EasyEffects ya están instalados."
+fi
 
 success "🎉 ¡Módulo de Audio completado con éxito!"
