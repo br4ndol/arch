@@ -36,7 +36,8 @@ PACKAGES=(
     "plasma-desktop" "sddm" "sddm-kcm" "flatpak-kcm"
     # Integración y utilidades
     "dolphin" "kscreen" "kde-gtk-config" "partitionmanager"
-    "plasma-pa" "plasma-nm" "bluedevil" "spectacle"
+    "plasma-pa" "plasma-nm" "bluedevil" "spectacle" "ghostty"
+    "ark" "7zip" "unrar" "noto-fonts" "noto-fonts-cjk" "noto-fonts-emoji"
 )
 
 # --- Lista de Flatpaks para KDE ---
@@ -45,6 +46,7 @@ FLATPAKS=(
     "org.kde.kcalc"
     "org.kde.gwenview"
     "org.videolan.VLC"
+    "org.onlyoffice.desktopeditors"
 )
 
 # --- 1. Instalación de Paquetes Pacman ---
