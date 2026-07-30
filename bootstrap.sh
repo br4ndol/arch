@@ -196,8 +196,8 @@ fi
 # --- 6. Configuración dentro de chroot ---
 msg "Iniciando configuración en chroot (/mnt)..."
 
-# Exportar variables necesarias para que el entorno chroot las reconozca
-export TARGET_USER HOST_NAME TIME_ZONE REPO_URL PASSWORD PART_EFI
+# 1. EXPORTAR PART_ROOT (Añadido aquí)
+export TARGET_USER HOST_NAME TIME_ZONE REPO_URL PASSWORD PART_EFI PART_ROOT
 
 arch-chroot /mnt /bin/bash <<'EOF'
 set -e
@@ -274,6 +274,12 @@ fi
 msg "Habilitando NetworkManager..."
 systemctl enable NetworkManager.service
 success "NetworkManager habilitado."
+
+# --- Configurar cmdline de arranque para la UKI (Añadido aquí) ---
+msg "Generando archivo /etc/kernel/cmdline..."
+ROOT_UUID=$(blkid -s UUID -o value "/dev/$PART_ROOT")
+echo "root=UUID=$ROOT_UUID rw quiet loglevel=3" > /etc/kernel/cmdline
+success "Archivo /etc/kernel/cmdline configurado con UUID=$ROOT_UUID."
 
 # --- Configurar archivo preset para UKI (EFISTUB) ---
 PRESET_FILE="/etc/mkinitcpio.d/linux-cachyos-bore.preset"
