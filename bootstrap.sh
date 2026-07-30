@@ -78,6 +78,13 @@ if [ ! -d "/sys/firmware/efi" ]; then
 fi
 success "Sistema iniciado en modo UEFI."
 
+# Verificar si la partición raíz tiene un sistema de archivos válido
+if ! blkid "/dev/$PART_ROOT" | grep -q "TYPE=\"ext4\""; then
+    msg "Formateando /dev/$PART_ROOT como ext4..."
+    mkfs.ext4 "/dev/$PART_ROOT"
+    success "Partición /dev/$PART_ROOT formateada como ext4."
+fi
+
 # --- 2. Montar Particiones ---
 msg "Preparando y montando particiones..."
 
