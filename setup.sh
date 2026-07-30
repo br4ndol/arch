@@ -57,7 +57,7 @@ BASE_MODULES=(
     "07-audio.sh"
     "08-zram.sh"
     "09-gaming.sh"
-    "10-appimages.sh"
+    "10-appimage.sh"
 )
 
 # --- Módulos según el Entorno Seleccionado ---
