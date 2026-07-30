@@ -194,8 +194,21 @@ fi
 # --- 6. Configuración dentro de chroot ---
 msg "Iniciando configuración en chroot (/mnt)..."
 
+# Pasar variables al entorno chroot
+export TARGET_USER TARGET_HOME TIME_ZONE REPO_URL PASSWORD
+
 arch-chroot /mnt /bin/bash <<'EOF'
 set -e
+
+# --- Redefinir funciones y colores para el entorno chroot ---
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+RED='\033[0;31m'
+NC='\033[0m'
+
+msg() { echo -e "${YELLOW}[BOOTSTRAP]${NC} $1"; }
+success() { echo -e "${GREEN}[OK]${NC} $1"; }
+error() { echo -e "${RED}[ERROR]${NC} $1" >&2; }
 
 # --- Configurar Zona Horaria ---
 msg "Configurando zona horaria a $TIME_ZONE..."
@@ -216,12 +229,10 @@ echo "$HOST_NAME" > /etc/hostname
 success "Hostname configurado."
 
 # --- Instalar paquetes de CachyOS v3 en el nuevo sistema ---
-
-# Importar y firmar llaves GPG de CachyOS
+msg "Instalando paquetes de CachyOS v3 (keyring y mirrorlists)..."
 pacman-key --recv-keys F3B607488DB35A47 --keyserver keyserver.ubuntu.com
 pacman-key --lsign-key F3B607488DB35A47
 
-msg "Instalando paquetes de CachyOS v3 (keyring y mirrorlists)..."
 pacman -U --noconfirm \
     'https://mirror.cachyos.org/repo/x86_64/cachyos/cachyos-keyring-20240331-1-any.pkg.tar.zst' \
     'https://mirror.cachyos.org/repo/x86_64/cachyos/cachyos-mirrorlist-27-1-any.pkg.tar.zst' \
