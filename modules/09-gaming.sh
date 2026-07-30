@@ -123,6 +123,6 @@ success "Archivo gamemode.ini configurado correctamente en $GAMEMODE_INI_FILE."
 
 # --- 5. Instalación de Flatpaks ---
 msg "Verificando e instalando Flatpaks para juegos..."
-instalar_flatpak "${FLATPAKS[@]}"
+#instalar_flatpak "${FLATPAKS[@]}"
 
 success "🎉 ¡Módulo de Juegos y Rendimiento completado con éxito!"
