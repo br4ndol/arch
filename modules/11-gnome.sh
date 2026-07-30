@@ -92,6 +92,7 @@ user_gsettings set org.gnome.desktop.interface clock-format '24h'
 user_gsettings set org.gnome.desktop.calendar week-start-day 'monday'
 user_gsettings set org.gnome.desktop.sound theme-name 'ocean'
 user_gsettings set org.gnome.desktop.sound allow-volume-above-100-percent true
+user_gsettings set org.gnome.desktop.wm.preferences button-layout 'icon,appmenu:minimize,maximize,close'
 
 # Configuración de energía
 user_gsettings set org.gnome.settings-daemon.plugins.power power-button-action 'nothing'
