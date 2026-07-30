@@ -196,8 +196,8 @@ fi
 # --- 6. Configuración dentro de chroot ---
 msg "Iniciando configuración en chroot (/mnt)..."
 
-# Pasar variables al entorno chroot
-export TARGET_USER TARGET_HOME TIME_ZONE REPO_URL PASSWORD
+# Exportar variables necesarias para que el entorno chroot las reconozca
+export TARGET_USER HOST_NAME TIME_ZONE REPO_URL PASSWORD PART_EFI
 
 arch-chroot /mnt /bin/bash <<'EOF'
 set -e
@@ -255,7 +255,6 @@ sed -i '/^#\[multilib\]/,/^#Include/ s/^#//' /etc/pacman.conf
 
 # Sincronizar bases de datos de pacman
 pacman -Syy
-
 success "Repositorios de CachyOS v3 configurados en el nuevo sistema."
 
 # --- Crear Usuario Principal ---
@@ -275,6 +274,56 @@ fi
 msg "Habilitando NetworkManager..."
 systemctl enable NetworkManager.service
 success "NetworkManager habilitado."
+
+# --- Configurar archivo preset para UKI (EFISTUB) ---
+PRESET_FILE="/etc/mkinitcpio.d/linux-cachyos-bore.preset"
+UKI_PATH="/efi/EFI/Linux/arch-linux-cachyos-bore.efi"
+
+msg "Configurando preset de mkinitcpio para UKI..."
+if [ -f "$PRESET_FILE" ]; then
+    sed -i "s/^PRESETS=.*/PRESETS=('default')/" "$PRESET_FILE"
+    
+    if grep -q "default_uki" "$PRESET_FILE"; then
+        sed -i "s|^#*default_uki=.*|default_uki=\"$UKI_PATH\"|" "$PRESET_FILE"
+    else
+        echo "default_uki=\"$UKI_PATH\"" >> "$PRESET_FILE"
+    fi
+    
+    if grep -q "default_options" "$PRESET_FILE"; then
+        sed -i "s|^#*default_options=.*|default_options=\"\"|" "$PRESET_FILE"
+    else
+        echo 'default_options=""' >> "$PRESET_FILE"
+    fi
+    success "Preset configurado."
+else
+    error "No se encontró el preset de mkinitcpio."
+    exit 1
+fi
+
+# --- Generar la imagen de arranque unificada (UKI) ---
+msg "Generando Unified Kernel Image (UKI)..."
+mkdir -p /efi/EFI/Linux
+mkinitcpio -p linux-cachyos-bore
+
+# --- Copiar UKI como ejecutable de respaldo por defecto (Soluciona pérdidas de NVRAM en QEMU) ---
+msg "Configurando ejecutable de arranque de respaldo UEFI..."
+mkdir -p /efi/EFI/BOOT
+cp -f "$UKI_PATH" /efi/EFI/BOOT/BOOTX64.EFI
+success "Ejecutable de respaldo UEFI configurado correctamente."
+
+# --- Registrar entrada UEFI en la placa madre ---
+msg "Creando entrada de arranque UEFI en la NVRAM..."
+ESP_DEV=$(findmnt -no SOURCE /efi)
+if [ -n "$ESP_DEV" ]; then
+    DISK="/dev/$(lsblk -no PKNAME "$ESP_DEV")"
+    PART="$(lsblk -no PARTN "$ESP_DEV")"
+    
+    # Crear la entrada utilizando efibootmgr
+    efibootmgr --create --disk "$DISK" --part "$PART" --label "Arch Linux (cachyos-bore)" --loader '\EFI\Linux\arch-linux-cachyos-bore.efi'
+    success "Entrada UEFI registrada con efibootmgr."
+else
+    error "No se pudo detectar el disco de /efi para efibootmgr."
+fi
 
 # --- Clonar repositorio arch-setup ---
 msg "Clonando repositorio $REPO_URL..."
