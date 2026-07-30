@@ -250,12 +250,31 @@ if ! grep -q "cachyos-v3" /etc/pacman.conf; then
 # CachyOS optimized repos - x86-64-v3\n[cachyos-v3]\nInclude = /etc/pacman.d/cachyos-v3-mirrorlist\n\n[cachyos-core-v3]\nInclude = /etc/pacman.d/cachyos-v3-mirrorlist\n\n[cachyos-extra-v3]\nInclude = /etc/pacman.d/cachyos-v3-mirrorlist\n' /etc/pacman.conf
 fi
 
+success "Repositorios de CachyOS v3 configurados en el nuevo sistema."
+
 # Habilitar repositorio [multilib]
 sed -i '/^#\[multilib\]/,/^#Include/ s/^#//' /etc/pacman.conf
 
-# Sincronizar bases de datos de pacman
+# --- Configurar llaves y repositorios de Chaotic-AUR y CachyOS Base (Al Final) ---
+msg "Configurando llaves de Chaotic-AUR..."
+pacman-key --recv-key 3056513887B78AEB --keyserver keyserver.ubuntu.com
+pacman-key --lsign-key 3056513887B78AEB
+
+msg "Instalando llaveros y mirrorlists de Chaotic-AUR..."
+pacman -U --noconfirm \
+    'https://cdn-mirror.chaotic.cx/chaotic-aur/chaotic-keyring.pkg.tar.zst' \
+    'https://cdn-mirror.chaotic.cx/chaotic-aur/chaotic-mirrorlist.pkg.tar.zst'
+
+# Agregar al final del pacman.conf si no existen
+if ! grep -q "chaotic-aur" /etc/pacman.conf; then
+    msg "Añadiendo repositorios chaotic-aur y cachyos al final de pacman.conf..."
+    echo -e "\n[chaotic-aur]\nInclude = /etc/pacman.d/chaotic-mirrorlist\n\n[cachyos]\nInclude = /etc/pacman.d/cachyos-mirrorlist" >> /etc/pacman.conf
+fi
+
+# Sincronizar bases de datos de pacman definitivas
 pacman -Syy
-success "Repositorios de CachyOS v3 configurados en el nuevo sistema."
+success "Todos los repositorios (CachyOS v3, Multilib, Chaotic-AUR y CachyOS base) configurados con éxito."
+
 
 # --- Crear Usuario Principal ---
 msg "Creando usuario $TARGET_USER..."
