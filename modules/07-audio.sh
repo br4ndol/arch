@@ -36,7 +36,7 @@ PACKAGES=(
     "pipewire" "pipewire-audio" "pipewire-alsa" "pipewire-pulse" "pipewire-jack"
     "alsa-utils" "alsa-ucm-conf" "sof-firmware" "rtkit" "realtime-privileges"
     "gst-plugin-pipewire" "lib32-pipewire" "lib32-pipewire-jack" "wireplumber"
-    "pavucontrol" "curl" "flatpak"
+    "curl" "flatpak"
 )
 
 # --- 1. Instalación de Paquetes ---
