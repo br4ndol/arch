@@ -64,8 +64,11 @@ msg "============================================="
 # --- 1. Verificaciones Iniciales ---
 msg "Verificando entorno de instalación..."
 
-# Verificar conexión a internet
-if ! ping -c 1 archlinux.org &>/dev/null; then
+# --- 1. Verificaciones Iniciales ---
+msg "Verificando entorno de instalación..."
+
+# Verificar conexión a internet (usando curl en lugar de ping)
+if ! curl -s --connect-timeout 5 -I https://archlinux.org &>/dev/null; then
     error "No hay conexión a internet. Conéctate vía Ethernet o iwctl antes de continuar."
     exit 1
 fi
@@ -83,6 +86,13 @@ if ! blkid "/dev/$PART_ROOT" | grep -q "TYPE=\"ext4\""; then
     msg "Formateando /dev/$PART_ROOT como ext4..."
     mkfs.ext4 "/dev/$PART_ROOT"
     success "Partición /dev/$PART_ROOT formateada como ext4."
+fi
+
+# Verificar si la partición EFI tiene un sistema de archivos válido
+if ! blkid "/dev/$PART_EFI" | grep -q "TYPE=\"fat32\""; then
+    msg "Formateando /dev/$PART_EFI como fat32..."
+    mkfs.fat -F32 "/dev/$PART_EFI"
+    success "Partición /dev/$PART_EFI formateada como fat32."
 fi
 
 # --- 2. Montar Particiones ---
