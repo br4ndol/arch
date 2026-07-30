@@ -89,10 +89,12 @@ if ! blkid "/dev/$PART_ROOT" | grep -q "TYPE=\"ext4\""; then
 fi
 
 # Verificar si la partición EFI tiene un sistema de archivos válido
-if ! blkid "/dev/$PART_EFI" | grep -q "TYPE=\"fat32\""; then
-    msg "Formateando /dev/$PART_EFI como fat32..."
+if ! blkid "/dev/$PART_EFI" | grep -q 'TYPE="vfat"'; then
+    msg "Formateando /dev/$PART_EFI como FAT32..."
     mkfs.fat -F32 "/dev/$PART_EFI"
-    success "Partición /dev/$PART_EFI formateada como fat32."
+    success "Partición /dev/$PART_EFI formateada como FAT32."
+else
+    msg "La partición /dev/$PART_EFI ya está formateada como FAT32."
 fi
 
 # --- 2. Montar Particiones ---
