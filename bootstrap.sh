@@ -64,9 +64,6 @@ msg "============================================="
 # --- 1. Verificaciones Iniciales ---
 msg "Verificando entorno de instalación..."
 
-# --- 1. Verificaciones Iniciales ---
-msg "Verificando entorno de instalación..."
-
 # Verificar conexión a internet (usando curl en lugar de ping)
 if ! curl -s --connect-timeout 5 -I https://archlinux.org &>/dev/null; then
     error "No hay conexión a internet. Conéctate vía Ethernet o iwctl antes de continuar."
@@ -81,27 +78,29 @@ if [ ! -d "/sys/firmware/efi" ]; then
 fi
 success "Sistema iniciado en modo UEFI."
 
-# Verificar si la partición raíz tiene un sistema de archivos válido
-if ! blkid "/dev/$PART_ROOT" | grep -q "TYPE=\"ext4\""; then
-    msg "Formateando /dev/$PART_ROOT como ext4..."
-    mkfs.ext4 "/dev/$PART_ROOT"
-    success "Partición /dev/$PART_ROOT formateada como ext4."
+# Desmontar limpiamente cualquier montaje previo en /mnt antes de formatear
+umount -R /mnt 2>/dev/null || true
+
+# Formatear la partición raíz (ext4) de manera forzada para eliminar el sistema anterior
+msg "Formateando /dev/$PART_ROOT como ext4..."
+if mkfs.ext4 -F "/dev/$PART_ROOT"; then
+    success "Partición /dev/$PART_ROOT formateada como ext4 (limpieza completa)."
+else
+    error "Error al formatear la partición raíz."
+    exit 1
 fi
 
-# Verificar si la partición EFI tiene un sistema de archivos válido
-if ! blkid "/dev/$PART_EFI" | grep -q 'TYPE="vfat"'; then
-    msg "Formateando /dev/$PART_EFI como FAT32..."
-    mkfs.fat -F32 "/dev/$PART_EFI"
+# Formatear la partición EFI (FAT32) de manera forzada para limpiar bootloaders antiguos
+msg "Formateando /dev/$PART_EFI como FAT32..."
+if mkfs.fat -F32 "/dev/$PART_EFI"; then
     success "Partición /dev/$PART_EFI formateada como FAT32."
 else
-    msg "La partición /dev/$PART_EFI ya está formateada como FAT32."
+    error "Error al formatear la partición EFI."
+    exit 1
 fi
 
 # --- 2. Montar Particiones ---
 msg "Preparando y montando particiones..."
-
-# Desmontar limpiamente cualquier montaje previo en /mnt
-umount -R /mnt 2>/dev/null || true
 
 # Montar partición Raíz (ext4)
 if [ -b "/dev/$PART_ROOT" ]; then
@@ -196,7 +195,7 @@ fi
 # --- 6. Configuración dentro de chroot ---
 msg "Iniciando configuración en chroot (/mnt)..."
 
-# 1. EXPORTAR PART_ROOT (Añadido aquí)
+# EXPORTAR variables necesarias para que el entorno chroot las reconozca
 export TARGET_USER HOST_NAME TIME_ZONE REPO_URL PASSWORD PART_EFI PART_ROOT
 
 arch-chroot /mnt /bin/bash <<'EOF'
@@ -275,7 +274,6 @@ fi
 pacman -Syy
 success "Todos los repositorios (CachyOS v3, Multilib, Chaotic-AUR y CachyOS base) configurados con éxito."
 
-
 # --- Crear Usuario Principal ---
 msg "Creando usuario $TARGET_USER..."
 if ! id "$TARGET_USER" &>/dev/null; then
@@ -294,7 +292,7 @@ msg "Habilitando NetworkManager..."
 systemctl enable NetworkManager.service
 success "NetworkManager habilitado."
 
-# --- Configurar cmdline de arranque para la UKI (Añadido aquí) ---
+# --- Configurar cmdline de arranque para la UKI ---
 msg "Generando archivo /etc/kernel/cmdline..."
 ROOT_UUID=$(blkid -s UUID -o value "/dev/$PART_ROOT")
 echo "root=UUID=$ROOT_UUID rw quiet loglevel=3" > /etc/kernel/cmdline
@@ -359,6 +357,10 @@ if [ ! -d "$HOME_DIR/arch" ]; then
     success "Repositorio clonado en $HOME_DIR/arch."
 else
     msg "El repositorio ya existe en $HOME_DIR/arch."
+fi
+
+EOF
+
 fi
 
 EOF
