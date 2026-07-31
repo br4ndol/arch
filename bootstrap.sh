@@ -164,6 +164,7 @@ msg "Ejecutando pacstrap con el Kernel CachyOS-bore y paquetes base..."
 
 pacstrap -K /mnt \
     base base-devel \
+    linux-firmware-intel linux-firmware-nvidia linux-firmware-realtek linux-firmware-cirrus linux-firmware-other \
     cachyos-v3/linux-cachyos-bore \
     cachyos-v3/linux-cachyos-bore-headers \
     git networkmanager sudo efibootmgr nano
