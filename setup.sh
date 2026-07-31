@@ -64,7 +64,7 @@ BASE_MODULES=(
 if [ "$DESKTOP_ENV" = "kde" ]; then
     ENV_MODULES=("11-kde.sh")
 else
-    ENV_MODULES=("11-gnome.sh" "12-gnome-extras.sh") [5]
+    ENV_MODULES=("11-gnome.sh" "12-gnome-extras.sh")
 fi
 
 FINAL_MODULES=("13-finalize.sh")
