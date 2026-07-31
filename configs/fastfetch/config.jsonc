@@ -35,6 +35,11 @@ credits to: https://github.com/HyDE-Project/HyDE/tree/master/Configs/.config/fas
         "key": "  ",
         "format": "{6} {7} {8}"
       },
+      {"type": "host",
+        "key": "  󰌢",
+        "format": "{2}",
+        "keyColor": "cyan"
+      },
       {
         "type": "os",
         "key": "  󰣇",
