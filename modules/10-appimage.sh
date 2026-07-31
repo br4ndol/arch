@@ -33,7 +33,7 @@ TEMP_DIR="/tmp/appimages_installer"
 
 # --- 1. Instalación de Dependencias ---
 msg "Verificando dependencias necesarias (fuse, jq, Gearlever)..."
-instalar_paquete "fuse3" "jq" "curl"
+instalar_paquete "fuse" "jq" "curl"
 instalar_flatpak "it.mijorus.gearlever"
 
 # --- Función auxiliar: Consultar aplicaciones integradas en Gearlever ---
