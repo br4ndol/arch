@@ -37,6 +37,10 @@ user_gsettings() {
     runuser -u "$TARGET_USER" -- dbus-run-session gsettings "$@" 2>/dev/null
 }
 
+# --- Instalar gnome-keyring y libsecret ---
+msg "Instalando gnome-keyring y libsecret..."
+instalar_paquete "gnome-keyring" "libsecret"
+
 # --- 1. Bluetooth ---
 msg "Configurando Bluetooth..."
 PACKAGES_BLUETOOTH=("bluez" "bluez-utils" "gnome-bluetooth-3.0")
