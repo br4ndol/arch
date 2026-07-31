@@ -165,8 +165,8 @@ GHOSTTY_CONF_SRC="${SCRIPT_DIR}/../configs/config.ghostty"
 GHOSTTY_DIR="$TARGET_HOME/.config/ghostty"
 mkdir -p "$GHOSTTY_DIR"
 if [ -f "$GHOSTTY_CONF_SRC" ]; then
-    cp -f "$GHOSTTY_CONF_SRC" "$GHOSTTY_DIR/config"
-    chown "$TARGET_USER:$TARGET_USER" "$GHOSTTY_DIR/config"
+    cp -f "$GHOSTTY_CONF_SRC" "$GHOSTTY_DIR/config.ghostty"
+    chown "$TARGET_USER:$TARGET_USER" "$GHOSTTY_DIR/config.ghostty"
     success "Configuración de ghostty copiada."
 else
     error "No se encontró el archivo de configuración de ghostty en $GHOSTTY_CONF_SRC"
