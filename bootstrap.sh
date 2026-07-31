@@ -336,15 +336,27 @@ cp -f "$UKI_PATH" /efi/EFI/BOOT/BOOTX64.EFI
 success "Ejecutable de respaldo UEFI configurado correctamente."
 
 # --- Registrar entrada UEFI en la placa madre ---
-msg "Creando entrada de arranque UEFI en la NVRAM..."
+msg "Limpiando entradas UEFI previas (de reinstalaciones/pruebas anteriores)..."
 ESP_DEV=$(findmnt -no SOURCE /efi)
 if [ -n "$ESP_DEV" ]; then
     DISK="/dev/$(lsblk -no PKNAME "$ESP_DEV")"
     PART="$(lsblk -no PARTN "$ESP_DEV")"
-    
+
+    # Elimina cualquier entrada previa con nuestro label o la genérica
+    # "UEFI OS" que el firmware crea al detectar el fallback BOOTX64.EFI.
+    # grep -F (cadena literal) evita que los paréntesis del label rompan el regex.
+    mapfile -t boot_nums < <(efibootmgr | grep -F -e "Arch Linux (cachyos-bore)" -e "UEFI OS" | grep -oP '^Boot\K[0-9A-Fa-f]{4}')
+    if [ "${#boot_nums[@]}" -gt 0 ]; then
+        for num in "${boot_nums[@]}"; do
+            efibootmgr -b "$num" -B >/dev/null
+            msg "Entrada UEFI previa eliminada: Boot$num"
+        done
+    fi
+
+    msg "Creando entrada de arranque UEFI en la NVRAM..."
     # Crear la entrada utilizando efibootmgr
     efibootmgr --create --disk "$DISK" --part "$PART" --label "Arch Linux (cachyos-bore)" --loader '\EFI\Linux\arch-linux-cachyos-bore.efi'
-    success "Entrada UEFI registrada con efibootmgr."
+    success "Entrada UEFI registrada con efibootmgr (sin duplicados)."
 else
     error "No se pudo detectar el disco de /efi para efibootmgr."
 fi

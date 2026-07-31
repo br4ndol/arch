@@ -39,7 +39,11 @@ if [ -f "$UKI_PATH" ]; then
     uki_existe=1
 fi
 
-if efibootmgr | grep -q "$BOOT_LABEL"; then
+# Solo se considera "configurado" si existe EXACTAMENTE una entrada.
+# Si hay 0 o 2+ (duplicadas de reinstalaciones previas), forzamos que
+# el módulo continúe hasta la sección 7 para limpiarlas.
+uefi_count=$(efibootmgr | grep -c "$BOOT_LABEL" || true)
+if [ "$uefi_count" -eq 1 ]; then
     uefi_configurado=1
 fi
 
@@ -133,31 +137,52 @@ for k in /usr/lib/modules/*cachyos*bore*; do
     fi
 done
 
-# --- 7. Creación de Entrada UEFI en la NVRAM ---
+# --- 7. Limpieza de Duplicados y Creación de Entrada UEFI Única ---
 if [ $uefi_configurado -eq 0 ]; then
-    msg "Creando entrada de arranque UEFI..."
-    
+
+    msg "Buscando entradas UEFI duplicadas o huérfanas para eliminar..."
+
+    # Elimina cualquier entrada que:
+    #   a) tenga nuestra etiqueta "$BOOT_LABEL" (sin importar cuántas haya), o
+    #   b) sea la entrada genérica "UEFI OS" que el firmware crea solo al
+    #      detectar el fallback \EFI\BOOT\BOOTX64.EFI (mismo binario, otro nombre)
+    # Se usa grep -F (cadena literal) para que los paréntesis del label no se
+    # interpreten como regex.
+    mapfile -t boot_nums < <(efibootmgr | grep -F -e "$BOOT_LABEL" -e "UEFI OS" | grep -oP '^Boot\K[0-9A-Fa-f]{4}')
+
+    if [ "${#boot_nums[@]}" -gt 0 ]; then
+        for num in "${boot_nums[@]}"; do
+            msg "Eliminando entrada UEFI duplicada: Boot$num"
+            efibootmgr -b "$num" -B >/dev/null
+        done
+        success "Se eliminaron ${#boot_nums[@]} entrada(s) duplicada(s)/huérfana(s)."
+    else
+        msg "No se encontraron entradas previas que limpiar."
+    fi
+
+    msg "Creando entrada de arranque UEFI única..."
+
     # Detectar automáticamente disco y partición de la ruta /efi
     ESP_DEV=$(findmnt -no SOURCE /efi)
     if [ -z "$ESP_DEV" ]; then
         error "No se pudo detectar el dispositivo montado en /efi."
         exit 1
     fi
-    
+
     DISK="/dev/$(lsblk -no PKNAME "$ESP_DEV")"
     PART="$(lsblk -no PARTN "$ESP_DEV")"
-    
+
     msg "Detectado disco: $DISK, partición: $PART"
-    
+
     # Crear la entrada usando barras invertidas (\) requeridas por UEFI
     if efibootmgr --create --disk "$DISK" --part "$PART" --label "$BOOT_LABEL" --loader '\EFI\Linux\arch-linux-cachyos-bore.efi'; then
-        success "Entrada UEFI creada con éxito."
+        success "Entrada UEFI única creada con éxito."
     else
         error "Error al crear la entrada UEFI con efibootmgr."
         exit 1
     fi
 else
-    msg "La entrada UEFI '$BOOT_LABEL' ya existe."
+    msg "La entrada UEFI '$BOOT_LABEL' ya existe (única, sin duplicados)."
 fi
 
 # --- 8. Verificación Final ---
