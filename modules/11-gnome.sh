@@ -57,7 +57,7 @@ FLATPAKS=(
     "org.onlyoffice.desktopeditors"
     "com.github.tchx84.Flatseal"
     "ca.desrt.dconf-editor"
-    "net.nokyan.Resources"
+    "io.missioncenter.MissionCenter"
 )
 
 # --- 1. Instalación de Paquetes ---

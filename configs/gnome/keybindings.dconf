@@ -32,8 +32,8 @@ command='ghostty'
 binding='<Super>q'
 
 [custom-keybindings/custom6]
-name='Resources'
-command='flatpak run net.nokyan.Resources'
+name='MissionCenter'
+command='flatpak run io.missioncenter.MissionCenter'
 binding='<Shift><Control>Escape'
 
 [custom-keybindings/custom7]
