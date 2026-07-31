@@ -45,7 +45,7 @@ read -rp "URL del repositorio [https://github.com/br4ndol/arch.git]: " REPO_URL
 REPO_URL="${REPO_URL:-https://github.com/br4ndol/arch.git}"
 
 # --- Variables de Configuración (ahora dinámicas) ---
-LOCALE="en_US.UTF-8 UTF-8"  # Inglés (fijo, como pediste)
+export LOCALE="en_US.UTF-8 UTF-8"  # Inglés (fijo, como pediste)
 
 msg "============================================="
 msg "Configuración aplicada:"
@@ -358,10 +358,6 @@ if [ ! -d "$HOME_DIR/arch" ]; then
     success "Repositorio clonado en $HOME_DIR/arch."
 else
     msg "El repositorio ya existe en $HOME_DIR/arch."
-fi
-
-EOF
-
 fi
 
 EOF
