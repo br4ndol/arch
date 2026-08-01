@@ -99,18 +99,46 @@ fi
 msg "Configurando marcadores de GTK..."
 GTK_BOOKMARKS="$TARGET_HOME/.config/gtk-3.0/bookmarks"
 mkdir -p "$(dirname "$GTK_BOOKMARKS")"
-if ! grep -q "file:/// File System" "$GTK_BOOKMARKS"; then
-    echo "file:/// File System" >> "$GTK_BOOKMARKS"
-    chown -R "$TARGET_USER:$TARGET_USER" "$TARGET_HOME/.config/gtk-3.0"
-    success "Marcador 'File System' añadido."
+
+# Si el archivo no existe, crear uno con los marcadores predeterminados
+if [ ! -f "$GTK_BOOKMARKS" ]; then
+    cat > "$GTK_BOOKMARKS" <<EOF
+file://$TARGET_HOME/Downloads
+file://$TARGET_HOME/Documents
+file://$TARGET_HOME/Music
+file://$TARGET_HOME/Pictures
+file://$TARGET_HOME/Videos
+file:/// File System
+EOF
+    chown "$TARGET_USER:$TARGET_USER" "$GTK_BOOKMARKS"
+    success "Marcadores de GTK creados con marcador 'File System'."
 else
-    msg "Marcador 'File System' ya existe."
+    # Si el archivo existe, solo añadir el marcador personalizado si no está
+    if ! grep -q "file:/// File System" "$GTK_BOOKMARKS"; then
+        echo "file:/// File System" >> "$GTK_BOOKMARKS"
+        chown "$TARGET_USER:$TARGET_USER" "$GTK_BOOKMARKS"
+        success "Marcador 'File System' añadido."
+    else
+        msg "Marcador 'File System' ya existe."
+    fi
 fi
 
 msg "Eliminando directorios de usuario innecesarios..."
-xdg-user-dirs-update --set TEMPLATES "$TARGET_HOME" 2>/dev/null || true
-xdg-user-dirs-update --set PUBLICSHARE "$TARGET_HOME" 2>/dev/null || true
+
+# Redirigir TEMPLATES y PUBLICSHARE al HOME del usuario
+runuser -u "$TARGET_USER" -- xdg-user-dirs-update --set TEMPLATES "$TARGET_HOME"
+runuser -u "$TARGET_USER" -- xdg-user-dirs-update --set PUBLICSHARE "$TARGET_HOME"
+
+# Eliminar las carpetas físicas
 rm -rf "$TARGET_HOME/Public" "$TARGET_HOME/Templates" "$TARGET_HOME/Projects" 2>/dev/null || true
+
+# Verificar que el archivo user-dirs.dirs esté actualizado
+if [ -f "$TARGET_HOME/.config/user-dirs.dirs" ]; then
+    sed -i 's|XDG_TEMPLATES_DIR=.*|XDG_TEMPLATES_DIR="$HOME"|' "$TARGET_HOME/.config/user-dirs.dirs"
+    sed -i 's|XDG_PUBLICSHARE_DIR=.*|XDG_PUBLICSHARE_DIR="$HOME"|' "$TARGET_HOME/.config/user-dirs.dirs"
+    chown "$TARGET_USER:$TARGET_USER" "$TARGET_HOME/.config/user-dirs.dirs"
+fi
+
 success "Directorios innecesarios eliminados."
 
 # --- 3. Extensiones de GNOME ---
