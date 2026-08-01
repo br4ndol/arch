@@ -142,6 +142,19 @@ else
     exit 1
 fi
 
+# --- Instalar y configurar iconos Morewaita desde AUR ---
+msg "Instalando iconos Morewaita desde AUR..."
+if ! paquete_instalado "morewaita-icon-theme-git"; then
+    runuser -u "$TARGET_USER" -- yay -S --needed --noconfirm morewaita-icon-theme-git
+    success "Iconos Morewaita instalados desde AUR."
+else
+    msg "Los iconos Morewaita ya están instalados."
+fi
+
+# Establecer Morewaita como tema de iconos
+user_gsettings set org.gnome.desktop.interface icon-theme 'MoreWaita'
+success "Tema de iconos Morewaita configurado."
+
 # --- 5. Cursor Bibata ---
 msg "Configurando cursor Bibata-Modern-Classic..."
 CURSOR_DIR="/usr/share/icons/Bibata-Modern-Classic"
