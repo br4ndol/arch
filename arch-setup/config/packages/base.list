@@ -1,0 +1,22 @@
+# base.list — Lo mínimo que instala pacstrap. El kernel (KERNEL) y el
+# microcódigo (CPU-ucode) se añaden desde settings.conf.
+# Todo lo demás (escritorio, drivers, apps) va en post.sh.
+
+base
+linux-firmware-intel    # wifi AX211, Bluetooth y gráfica Intel. Si otra máquina
+                        # necesita más (ethernet Realtek, etc.): linux-firmware-realtek…
+                        # o el meta "linux-firmware" con todo.
+mkinitcpio              # genera el UKI
+efibootmgr              # entrada de arranque EFI (EFISTUB)
+sudo
+nano
+networkmanager
+iwd                     # backend wifi de NetworkManager
+
+# Llaves y mirrorlists de los repos extra: sin ellos pacman falla en el
+# sistema nuevo (el problema de "Part2" en ArchLinux2/Servers.md).
+cachyos-keyring
+cachyos-mirrorlist
+cachyos-v3-mirrorlist
+chaotic-keyring
+chaotic-mirrorlist

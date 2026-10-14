@@ -1,0 +1,8 @@
+# Generado por arch-setup (modules/install/chroot/boot.sh). Ver ArchLinux2/kernel.md
+ALL_config="/etc/mkinitcpio.conf"
+ALL_kver="/boot/vmlinuz-{{KERNEL}}"
+
+PRESETS=('default')
+
+default_uki="/efi/EFI/Linux/arch-{{KERNEL}}.efi"
+default_options=""
