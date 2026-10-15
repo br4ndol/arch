@@ -20,10 +20,16 @@ post_modules() {
     drivers     # vídeo según GPU (none en VM)
     audio       # PipeWire
     bluetooth   # BlueZ
+    asus        # asusctl, rog-control-center, power-profiles-daemon
     plymouth    # splash + cmdline quiet (regenera el UKI)
     zsh         # shell del usuario y de root
   )
   [[ -z ${DESKTOP:-} ]] || POST_MODULES+=("desktop/$DESKTOP")
+  POST_MODULES+=(
+    theme       # adw-gtk3 oscuro, cursor Bibata, Qt
+    nautilus    # extras, marcador, carpetas XDG, Samba
+    dotfiles    # config/files/home -> ~ (Ghostty, Fastfetch, GTK4)
+  )
 }
 
 usage() {

@@ -1,0 +1,7 @@
+# Tema de GNOME (ArchLinux2/Theme.md). Valores POR DEFECTO del sistema, como
+# settings.dconf: cada usuario puede cambiarlos luego.
+
+[org/gnome/desktop/interface]
+gtk-theme='adw-gtk3-dark'
+color-scheme='prefer-dark'
+cursor-theme='Bibata-Modern-Classic'

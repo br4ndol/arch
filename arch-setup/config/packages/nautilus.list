@@ -1,0 +1,7 @@
+# nautilus.list — Extras de Nautilus y Samba (ArchLinux2/nautilus.md)
+
+sushi file-roller 7zip unrar unzip
+ghostty-nautilus
+xdg-user-dirs
+gvfs-smb smbclient
+aur:nautilus-create-file

@@ -24,7 +24,8 @@ Principios:
 | install · live | `preflight` `settings` `repos` `disk` `pacstrap` | Probado en VM |
 | install · chroot | `system` `users` `network` `boot` | Probado en VM |
 | post | `mirrors` `auth` `zram` `aur` `drivers` `audio` `bluetooth` `plymouth` `zsh` `desktop/gnome` | Probado en VM |
-| post (siguiente) | `gaming` `asus` `theme` `nautilus` | Pendiente |
+| post | `asus` `theme` `nautilus` `dotfiles` | Probado en VM |
+| — | `gaming` | Fuera del script a propósito: se instala a mano (ver `ArchLinux2/gaming.md`) |
 
 ## Uso en la ISO
 
@@ -122,6 +123,7 @@ Si un módulo falla, el resumen final te dice el `--only` para repetir solo ese.
   ```
 
 - **`config/files/`**: plantillas de archivos que se copian al sistema. Pueden usar `{{VARIABLE}}`, que se sustituye por el valor de `settings.conf`.
+- **`config/files/home/`**: refleja tu HOME. El módulo `dotfiles` copia cada archivo a la misma ruta dentro de `~`, a tu nombre. Por ejemplo, `config/files/home/.config/ghostty/config.ghostty` acaba en `~/.config/ghostty/config.ghostty`. Ahí están las configs de Ghostty, Fastfetch (con el logo) y GTK4; para añadir otra, solo déjala en esa carpeta.
 
 ## Estructura
 

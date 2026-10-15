@@ -48,6 +48,16 @@ user_install_file() {
   fi
 }
 
+# user_ensure_line USUARIO ARCHIVO LINEA — ensure_line en un archivo del usuario.
+user_ensure_line() {
+  local user=$1 file=$2 line=$3
+  user_mkdir "$user" "$(dirname -- "$file")"
+  ensure_line "$file" "$line"
+  if [[ -e $file && $(stat -c %U -- "$file") != "$user" ]]; then
+    run chown -- "$user:" "$file"
+  fi
+}
+
 # user_write_file USUARIO DESTINO [MODO] <<'EOF' — write_file para el usuario.
 user_write_file() {
   local user=$1 dst=$2 mode=${3:-644} cand
