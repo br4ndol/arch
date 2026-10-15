@@ -77,13 +77,22 @@ Las dos fases están completas y probadas desde cero en una VM de VirtualBox (UE
    - El resto para `/`.
 
    No hace falta formatearlas: el script formatea las dos.
-3. Descarga el repo y ejecuta:
+3. Descarga el repo y ejecuta (la ISO no trae `git`, por eso se instala primero):
 
    ```bash
-   curl -L https://github.com/br4ndol/arch/archive/main.tar.gz | tar xz
-   cd arch-main
-   ./install.sh
+   pacman -Sy git
+   git clone https://github.com/br4ndol/arch
+   cd arch && ./install.sh
    ```
+
+   Sin instalar nada, con `curl`, que sí viene en la ISO:
+
+   ```bash
+   curl -L github.com/br4ndol/arch/archive/main.tar.gz | tar xz
+   cd arch-main && ./install.sh
+   ```
+
+**Para no escribir a mano:** la ISO trae SSH. En el portátil, ejecuta `passwd` (contraseña temporal) e `ip -br a` (para ver su IP). Desde otro PC de la misma red conéctate con `ssh root@<IP>` y pega los comandos.
 
 La primera vez te pregunta los datos de la instalación. Entre corchetes aparece el valor por defecto; con Enter lo aceptas.
 
@@ -118,10 +127,14 @@ Además hay una copia del UKI principal en la ruta de respaldo UEFI `\EFI\BOOT\B
 Inicia sesión con tu usuario (en la TTY, todavía sin escritorio) y ejecuta:
 
 ```bash
-curl -L https://github.com/br4ndol/arch/archive/main.tar.gz | tar xz
-cd arch-main
-sudo bash post.sh
+sudo pacman -S git            # el módulo zsh lo instala igualmente
+git clone https://github.com/br4ndol/arch
+cd arch && sudo ./post.sh
 ```
+
+O con `curl`: `curl -L github.com/br4ndol/arch/archive/main.tar.gz | tar xz && cd arch-main && sudo ./post.sh`.
+
+Al usar `git clone`, para tener la última versión del script más adelante basta con `cd arch && git pull`.
 
 - **Drivers de vídeo:** como `settings.local.conf` no se queda en el sistema, el módulo `drivers` vuelve a preguntar (`nvidia-hybrid`, `intel` o `none`, detectado automáticamente). Para no tener que responder, pon `GPU=` en `config/settings.conf`.
 - **Escritorio:** `DESKTOP` en `settings.conf` elige el módulo `desktop/<nombre>`.
