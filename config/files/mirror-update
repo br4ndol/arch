@@ -40,6 +40,7 @@ rank cachyos /etc/pacman.d/cachyos-mirrorlist || exit 1
 
 echo ":: Copying mirrors to CachyOS-v3"
 cp -f /etc/pacman.d/cachyos-mirrorlist /etc/pacman.d/cachyos-v3-mirrorlist || exit 1
+# shellcheck disable=SC2016  # $arch y $arch_v3 son literales de pacman
 sed -i 's|/$arch/|/$arch_v3/|g' /etc/pacman.d/cachyos-v3-mirrorlist || exit 1
 head -n 5 /etc/pacman.d/cachyos-v3-mirrorlist
 

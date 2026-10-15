@@ -1,3 +1,2 @@
-# Los scripts se ejecutan en Linux: siempre LF, aunque se editen en Windows.
-arch-setup/** text eol=lf
-*.sh text eol=lf
+# Los scripts y configs se ejecutan/leen en Linux: siempre LF, aunque se editen en Windows.
+* text=auto eol=lf
