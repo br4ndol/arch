@@ -1,0 +1,20 @@
+# gnome.list — Escritorio GNOME (ArchLinux2/gnome-base.md, gnome-bluetooth.md)
+
+gnome-shell gdm gnome-control-center gnome-backgrounds gnome-disk-utility gnome-tweaks
+gnome-bluetooth-3.0
+ghostty ocean-sound-theme ddcutil
+noto-fonts noto-fonts-cjk noto-fonts-emoji
+
+# Apps (Flathub)
+flatpak:org.gnome.Calculator
+flatpak:org.gnome.TextEditor
+flatpak:org.gnome.Loupe
+flatpak:org.gnome.Showtime
+flatpak:be.alexandervanhee.gradia
+flatpak:it.mijorus.smile
+flatpak:io.github.realmazharhussain.GdmSettings
+flatpak:page.codeberg.libre_menu_editor.LibreMenuEditor
+flatpak:org.onlyoffice.desktopeditors
+flatpak:com.github.tchx84.Flatseal
+flatpak:ca.desrt.dconf-editor
+flatpak:net.nokyan.Resources

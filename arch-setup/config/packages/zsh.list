@@ -1,0 +1,5 @@
+# zsh.list — Shell, prompt y plugins (ArchLinux2/zshell.md)
+
+zsh zsh-completions zsh-autosuggestions zsh-syntax-highlighting
+starship fzf eza zoxide fastfetch git
+ttf-jetbrains-mono-nerd

@@ -1,0 +1,8 @@
+# gpu-nvidia.list — Nvidia (ArchLinux2/Video Drivers.md). Solo con GPU=nvidia-hybrid.
+# El módulo del kernel (KERNEL-nvidia-open, p. ej. linux-cachyos-bore-nvidia-open)
+# lo añade drivers.sh según settings.conf.
+
+nvidia-utils lib32-nvidia-utils nvidia-settings
+libva-nvidia-driver libva-utils
+vulkan-tools mesa-utils
+nvidia-prime switcheroo-control

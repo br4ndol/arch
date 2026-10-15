@@ -1,0 +1,31 @@
+# Ajustes de GNOME (ArchLinux2/gnome-base.md, paso 2).
+# Se instalan como valores POR DEFECTO del sistema (/etc/dconf/db/local.d/):
+# valen para todos los usuarios y cada uno puede cambiarlos luego.
+# Formato keyfile de dconf: [ruta/del/schema] y clave=valor en sintaxis GVariant.
+
+[org/gnome/desktop/interface]
+clock-format='24h'
+
+[org/gnome/desktop/calendar]
+week-start-day='monday'
+
+[org/gnome/desktop/sound]
+theme-name='ocean'
+allow-volume-above-100-percent=true
+
+[org/gnome/settings-daemon/plugins/power]
+power-button-action='nothing'
+power-saver-profile-on-low-battery=true
+sleep-inactive-ac-type='nothing'
+idle-dim=false
+
+[org/gnome/desktop/session]
+idle-delay=uint32 0
+
+[org/gnome/nautilus/preferences]
+default-sort-order='type'
+show-image-thumbnails='always'
+show-create-link=true
+
+[org/gnome/shell]
+always-show-log-out=true

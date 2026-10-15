@@ -1,0 +1,50 @@
+#!/usr/bin/env bash
+# mirror-update — Ordena los mirrors de Arch, CachyOS y Chaotic-AUR por velocidad.
+# Instalado por arch-setup (modules/post/mirrors.sh). Ver ArchLinux2/zshell.md
+set -uo pipefail
+
+[[ $EUID -eq 0 ]] || exec sudo "$0" "$@"
+
+ts=$(date +%F-%H%M%S)
+files=(
+  /etc/pacman.d/mirrorlist
+  /etc/pacman.d/cachyos-mirrorlist
+  /etc/pacman.d/cachyos-v3-mirrorlist
+  /etc/pacman.d/chaotic-mirrorlist
+)
+
+rank() {   # uso: rank <repo> <destino>
+  local tmp
+  tmp=$(mktemp) || return 1
+  if rate-mirrors --protocol=https --disable-comments "$1" > "$tmp" && [[ -s $tmp ]]; then
+    install -m 644 "$tmp" "$2"
+  else
+    echo "!! rate-mirrors $1 falló; se conserva $2" >&2
+    rm -f "$tmp"
+    return 1
+  fi
+  rm -f "$tmp"
+  head -n 5 "$2"
+}
+
+echo ":: Backing up current mirrorlists"
+for f in "${files[@]}"; do
+  [[ -f $f ]] && cp -a "$f" "$f.bak-$ts"
+done
+
+echo ":: Searching for the best Arch Linux mirrors"
+rank arch /etc/pacman.d/mirrorlist || exit 1
+
+echo ":: Searching for the best CachyOS mirrors"
+rank cachyos /etc/pacman.d/cachyos-mirrorlist || exit 1
+
+echo ":: Copying mirrors to CachyOS-v3"
+cp -f /etc/pacman.d/cachyos-mirrorlist /etc/pacman.d/cachyos-v3-mirrorlist || exit 1
+sed -i 's|/$arch/|/$arch_v3/|g' /etc/pacman.d/cachyos-v3-mirrorlist || exit 1
+head -n 5 /etc/pacman.d/cachyos-v3-mirrorlist
+
+echo ":: Searching for the best Chaotic-AUR mirrors"
+rank chaotic-aur /etc/pacman.d/chaotic-mirrorlist || exit 1
+
+echo ":: Refreshing package databases"
+pacman -Syy

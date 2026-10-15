@@ -47,7 +47,7 @@ _ask_system() {
 
   log_step "Drivers de vídeo"
   log_info "nvidia-hybrid = Intel + Nvidia (portátil) · intel = solo Intel · none = ninguno (VM)"
-  : "${GPU:=$(_detect_gpu)}"
+  : "${GPU:=$(detect_gpu)}"
   choose "¿Qué drivers instalar?" GPU nvidia-hybrid intel none
 }
 
@@ -65,16 +65,6 @@ _ask_password() {
   unset pw
 }
 
-# _detect_gpu — Propuesta por defecto: none en VM, nvidia-hybrid si hay Nvidia.
-_detect_gpu() {
-  if systemd-detect-virt --quiet --vm 2>/dev/null; then
-    echo none
-  elif [[ -n $(lspci -d 10de: 2>/dev/null) ]]; then
-    echo nvidia-hybrid
-  else
-    echo intel
-  fi
-}
 
 _summary() {
   local v

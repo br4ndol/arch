@@ -58,5 +58,17 @@ is_arch() { [[ -f /etc/arch-release ]]; }
 
 is_block_device() { [[ -b $1 ]]; }
 
+# detect_gpu — Propuesta de drivers: none en una VM, nvidia-hybrid si hay una
+# Nvidia, si no intel.
+detect_gpu() {
+  if systemd-detect-virt --quiet --vm 2>/dev/null; then
+    echo none
+  elif [[ -n $(lspci -d 10de: 2>/dev/null) ]]; then
+    echo nvidia-hybrid
+  else
+    echo intel
+  fi
+}
+
 # is_mounted RUTA — RUTA es un punto de montaje.
 is_mounted() { findmnt -rn --mountpoint "$1" >/dev/null 2>&1; }

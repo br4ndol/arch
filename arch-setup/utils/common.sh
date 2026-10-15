@@ -26,7 +26,7 @@ export ROOT_DIR CONFIG_DIR MODULES_DIR DRY_RUN ASSUME_YES VERBOSE RUN_TS
 # Directorio temporal propio de este proceso; se borra al salir.
 RUN_TMPDIR="$(mktemp -d "${TMPDIR:-/tmp}/arch-setup.XXXXXX")"
 
-for _f in log confirm execute checks files packages services users; do
+for _f in log confirm execute checks files packages services users boot; do
   # shellcheck source=/dev/null
   source "$UTILS_DIR/$_f.sh"
 done

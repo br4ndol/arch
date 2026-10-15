@@ -1,0 +1,7 @@
+# audio.list — PipeWire (ArchLinux2/Audio.md)
+
+pipewire pipewire-audio pipewire-alsa pipewire-pulse pipewire-jack wireplumber
+lib32-pipewire lib32-pipewire-jack gst-plugin-pipewire
+alsa-utils alsa-ucm-conf sof-firmware
+rtkit realtime-privileges
+pavucontrol

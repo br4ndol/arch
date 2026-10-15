@@ -109,6 +109,8 @@ aur_install() {
     return 0
   fi
   aur_ensure_helper
+  # Compilar desde AUR necesita base-devel; solo se instala si de verdad se usa AUR.
+  pkg_install base-devel
   helper=$(aur_helper) || helper=${AUR_HELPER:-yay}
   # Sin preguntas de diff/limpieza; --removemake borra las dependencias de compilación.
   case $helper in

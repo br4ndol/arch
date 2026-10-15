@@ -2,6 +2,13 @@
 # desc: cmdline, UKI con mkinitcpio y entrada de arranque EFI (EFISTUB)
 #
 # Ver ArchLinux2/kernel.md. Sin bootloader: el firmware arranca el UKI.
+#
+# Además del UKI y su entrada EFI, deja una copia en la ruta de respaldo UEFI
+# (\EFI\BOOT\BOOTX64.EFI), que el firmware arranca si pierde la entrada. Un post
+# hook de mkinitcpio la mantiene al día en cada actualización del kernel.
+
+POST_HOOK=/etc/initcpio/post/arch-setup-uki-fallback
+FALLBACK=/efi/EFI/BOOT/BOOTX64.EFI
 
 module_run() {
   local uki="/efi/EFI/Linux/arch-$KERNEL.efi" root_uuid rebuild=0
@@ -20,6 +27,10 @@ module_run() {
   ((FILE_CHANGED)) && rebuild=1
   [[ -d /efi/EFI/Linux ]] || run mkdir -p /efi/EFI/Linux
 
+  log_step "Copia de respaldo en \\EFI\\BOOT\\BOOTX64.EFI"
+  # Se instala antes de generar el UKI: mkinitcpio la mantiene al día desde ahora.
+  render_template "$CONFIG_DIR/files/uki-fallback.hook" "$POST_HOOK" 755
+
   log_step "UKI"
   if ((rebuild)) || [[ ! -f $uki ]]; then
     run mkinitcpio -p "$KERNEL"
@@ -31,6 +42,13 @@ module_run() {
   for img in /boot/initramfs-"$KERNEL"*.img; do
     if [[ -e $img ]]; then run rm -f -- "$img"; fi
   done
+
+  # Por si el UKI ya existía y no se regeneró (el hook solo actúa al regenerar).
+  if [[ -f $uki ]] && ! same_content "$uki" "$FALLBACK"; then
+    run mkdir -p -- "${FALLBACK%/*}"
+    run cp -f -- "$uki" "$FALLBACK"
+    log_ok "Copiado a $FALLBACK"
+  fi
 
   log_step "Entrada de arranque EFI"
   _ensure_uefi_entry "Arch Linux (${KERNEL#linux-})" "\\EFI\\Linux\\arch-$KERNEL.efi"

@@ -1,0 +1,3 @@
+[[ $- != *i* ]] && return
+
+source /root/.config/zsh/config.zsh

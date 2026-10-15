@@ -1,0 +1,13 @@
+[[ $- != *i* ]] && return
+
+alias inkscape='flatpak run org.inkscape.Inkscape'
+alias p='yay'
+alias boo='ghostty +boo'
+alias zsh-sync-root='sudo install -m 644 ~/.config/zsh/config.zsh /root/.config/zsh/config.zsh'
+
+[[ -r ~/.config/zsh/config.zsh ]] && source ~/.config/zsh/config.zsh
+
+# ---------- Fastfetch ----------
+if [[ -z "$SSH_CONNECTION" ]] && (( $+commands[fastfetch] )); then
+  fastfetch
+fi

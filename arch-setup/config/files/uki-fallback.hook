@@ -1,0 +1,19 @@
+#!/usr/bin/env bash
+# Post hook de mkinitcpio instalado por arch-setup (modules/install/chroot/boot.sh).
+#
+# Cada vez que se regenera el UKI principal, lo copia también a la ruta de
+# respaldo UEFI \EFI\BOOT\BOOTX64.EFI. El firmware arranca esa ruta cuando no
+# tiene entradas propias (si se pierde la de efibootmgr: reset de la BIOS,
+# actualización del firmware, VirtualBox…).
+#
+# mkinitcpio lo llama con: kernel, imagen(es) generada(s) y el UKI.
+
+uki=/efi/EFI/Linux/arch-{{KERNEL}}.efi
+fallback=/efi/EFI/BOOT/BOOTX64.EFI
+
+for arg in "$@"; do
+  if [[ $arg == "$uki" && -f $uki ]]; then
+    mkdir -p "${fallback%/*}" && cp -f "$uki" "$fallback"
+    exit
+  fi
+done

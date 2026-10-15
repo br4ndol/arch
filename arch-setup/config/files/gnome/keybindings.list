@@ -1,0 +1,14 @@
+# Atajos personalizados de GNOME (ArchLinux2/gnome-base.md, paso 5).
+# Formato: nombre | atajo | comando
+# Los que usan {{MONITOR_SERIAL}} solo se crean si MONITOR_SERIAL está definido
+# en settings (número de serie del monitor externo: ddcutil detect).
+
+ROG Control Center | XF86Launch1                 | rog-control-center
+Aura Effect        | XF86Launch3                 | asusctl aura effect --next-mode
+Power Plan         | XF86Launch4                 | asusctl profile next
+Emoji              | <Alt><Super>e               | flatpak run it.mijorus.smile
+Terminal           | <Super>q                    | ghostty
+Resources          | <Shift><Control>Escape      | flatpak run net.nokyan.Resources
+Screenshots        | <Shift><Super>s             | flatpak run be.alexandervanhee.gradia --screenshot=INTERACTIVE
+Brightness Up      | <Control>XF86MonBrightnessUp   | ddcutil --sn {{MONITOR_SERIAL}} setvcp 10 + 10
+Brightness Down    | <Control>XF86MonBrightnessDown | ddcutil --sn {{MONITOR_SERIAL}} setvcp 10 - 10

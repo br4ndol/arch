@@ -1,0 +1,15 @@
+# Generado por arch-setup (modules/post/drivers.sh). Ver ArchLinux2/Video Drivers.md
+# Regenera el UKI cuando cambia el driver Nvidia sin que cambie el kernel.
+[Trigger]
+Operation=Install
+Operation=Upgrade
+Operation=Remove
+Type=Package
+Target={{KERNEL}}-nvidia-open
+Target=nvidia-utils
+
+[Action]
+Description=Regenerando el UKI por cambio en el driver Nvidia
+Depends=mkinitcpio
+When=PostTransaction
+Exec=/usr/bin/mkinitcpio -p {{KERNEL}}

@@ -9,9 +9,22 @@ source "$(dirname -- "$(readlink -f -- "${BASH_SOURCE[0]}")")/utils/common.sh"
 # shellcheck source=utils/modules.sh
 source "$UTILS_DIR/modules.sh"
 
-# Módulos en orden de ejecución (modules/post/<nombre>.sh).
-POST_MODULES=(
-)
+# Módulos en orden de ejecución (modules/post/<nombre>.sh). Es una función
+# porque el escritorio depende de DESKTOP (settings.conf).
+post_modules() {
+  POST_MODULES=(
+    mirrors     # rate-mirrors + mirror-update
+    auth        # pwfeedback y faillock
+    zram        # swap en RAM
+    aur         # yay
+    drivers     # vídeo según GPU (none en VM)
+    audio       # PipeWire
+    bluetooth   # BlueZ
+    plymouth    # splash + cmdline quiet (regenera el UKI)
+    zsh         # shell del usuario y de root
+  )
+  [[ -z ${DESKTOP:-} ]] || POST_MODULES+=("desktop/$DESKTOP")
+}
 
 usage() {
   cat <<EOF
@@ -27,13 +40,14 @@ main() {
   parse_common_args "$@"
   ((${#EXTRA_ARGS[@]} == 0)) || die "Opción desconocida: ${EXTRA_ARGS[0]} (ver --help)"
 
+  load_config
+  post_modules
   if ((LIST_ONLY)); then
     list_modules "Post-instalación" "$MODULES_DIR/post" "${POST_MODULES[@]}"
     exit 0
   fi
 
   require_root
-  load_config
   log_init
   in_chroot && die "post.sh es para el sistema ya arrancado, no para el chroot"
   is_arch || die "Esto no parece Arch Linux"
@@ -43,7 +57,7 @@ main() {
   user_exists "$SYS_USER" || die "No existe el usuario '$SYS_USER'"
   export SYS_USER
 
-  log_section "arch-setup · post-instalación (usuario: $SYS_USER, escritorio: ${DESKTOP:-ninguno})"
+  log_section "arch-setup · post-instalación (usuario: $SYS_USER, escritorio: ${DESKTOP:-ninguno}, GPU: ${GPU:-none})"
   run_modules "$MODULES_DIR/post" "${POST_MODULES[@]}" || exit 1
 }
 

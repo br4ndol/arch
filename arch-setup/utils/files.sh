@@ -242,6 +242,7 @@ write_file() {
 
 # render_template PLANTILLA DESTINO [MODO] — Sustituye {{VARIABLE}} por el valor
 # de la variable (normalmente de settings.conf) y lo instala con install_file.
+# Con DESTINO "-" lo imprime por stdout (para procesarlo antes de instalarlo).
 # Falla si alguna variable no está definida.
 render_template() {
   local src=$1 dst=$2 mode=${3:-644} content var cand
@@ -255,6 +256,10 @@ render_template() {
     [[ -v $var ]] || die "render_template: variable no definida '$var' en $src"
     content=${content//"{{$var}}"/"${!var}"}
   done
+  if [[ $dst == - ]]; then
+    printf '%s\n' "$content"
+    return 0
+  fi
   cand=$(_candidate)
   printf '%s\n' "$content" >"$cand"
   install_file "$cand" "$dst" "$mode"

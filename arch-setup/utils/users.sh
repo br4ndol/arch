@@ -27,6 +27,35 @@ group_ensure() {
   log_ok "Grupo creado: $group"
 }
 
+# user_mkdir USUARIO DIR... — Crea las carpetas como el usuario (así ~/.config
+# y compañía nunca quedan a nombre de root).
+user_mkdir() {
+  local user=$1 dir
+  shift
+  for dir; do
+    [[ -d $dir ]] || run_as_user "$user" mkdir -p -- "$dir"
+  done
+}
+
+# user_install_file USUARIO ORIGEN DESTINO [MODO] — Como install_file, pero el
+# archivo y sus carpetas quedan a nombre del usuario.
+user_install_file() {
+  local user=$1 src=$2 dst=$3 mode=${4:-644}
+  user_mkdir "$user" "$(dirname -- "$dst")"
+  install_file "$src" "$dst" "$mode"
+  if [[ -e $dst && $(stat -c %U -- "$dst") != "$user" ]]; then
+    run chown -- "$user:" "$dst"
+  fi
+}
+
+# user_write_file USUARIO DESTINO [MODO] <<'EOF' — write_file para el usuario.
+user_write_file() {
+  local user=$1 dst=$2 mode=${3:-644} cand
+  cand=$(_candidate)
+  cat >"$cand"
+  user_install_file "$user" "$cand" "$dst" "$mode"
+}
+
 # user_add_group USUARIO GRUPO... — Añade a los grupos que falten (creándolos
 # como grupos de sistema si no existen). Los cambios aplican al volver a iniciar sesión.
 user_add_group() {

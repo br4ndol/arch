@@ -23,7 +23,8 @@ Principios:
 | --- | --- | --- |
 | install · live | `preflight` `settings` `repos` `disk` `pacstrap` | Probado en VM |
 | install · chroot | `system` `users` `network` `boot` | Probado en VM |
-| post | — | Pendiente |
+| post | `mirrors` `auth` `zram` `aur` `drivers` `audio` `bluetooth` `plymouth` `zsh` `desktop/gnome` | Probado en VM |
+| post (siguiente) | `gaming` `asus` `theme` `nautilus` | Pendiente |
 
 ## Uso en la ISO
 
@@ -64,6 +65,25 @@ Las respuestas se guardan en `config/settings.local.conf`. En las siguientes eje
 Antes de formatear tienes que escribir `FORMATEAR`. Esa confirmación no se salta ni con `--yes`.
 
 Al terminar, desmonta con `umount -R /mnt`, quita la ISO y reinicia. El firmware arranca directamente el UKI (`/efi/EFI/Linux/arch-linux-cachyos-bore.efi`) desde la entrada EFI "Arch Linux (cachyos-bore)".
+
+Además hay una copia del UKI en la ruta de respaldo UEFI `\EFI\BOOT\BOOTX64.EFI`. El firmware la arranca si pierde la entrada (al resetear la BIOS, al actualizar el firmware o en VirtualBox, que las olvida). Un post hook de mkinitcpio (`/etc/initcpio/post/arch-setup-uki-fallback`) la actualiza cada vez que se regenera el UKI.
+
+## Uso en el sistema instalado
+
+Inicia sesión con tu usuario (en la TTY, todavía sin escritorio) y ejecuta:
+
+```bash
+curl -L https://github.com/br4ndol/arch/archive/main.tar.gz | tar xz
+cd arch-main/arch-setup
+sudo bash post.sh
+```
+
+- **Drivers de vídeo:** como `settings.local.conf` no se queda en el sistema, el módulo `drivers` vuelve a preguntar (`nvidia-hybrid`, `intel` o `none`, detectado automáticamente). Para no tener que responder, pon `GPU=` en `config/settings.conf`.
+- **Escritorio:** `DESKTOP` en `settings.conf` elige el módulo `desktop/<nombre>`.
+- **Ajustes de GNOME:** se instalan como valores **por defecto** del sistema (dconf, en `/etc/dconf/db/local.d/`). No hace falta tener la sesión abierta y luego puedes cambiarlos desde Configuración.
+- **Atajos de brillo:** solo se crean si defines `MONITOR_SERIAL` (lo ves con `ddcutil detect`).
+
+Al terminar, reinicia: GDM arranca y entras a GNOME.
 
 ## Opciones
 
@@ -149,7 +169,8 @@ Para que el módulo siga siendo idempotente, usa las funciones de `utils/` y no 
 | `packages.sh` | `pkg_install` `pkg_remove` `aur_install` `flatpak_install` `install_list` |
 | `files.sh` | `set_kv` `ensure_line` `ensure_uncommented` `comment_line` `ensure_ini_section` `install_file` `write_file` `render_template` |
 | `services.sh` | `service_enable [--now]` `service_disable` `service_enable_global` `service_enable_user` |
-| `users.sh` | `user_add_group` `group_ensure` `user_home` `user_in_group` |
+| `users.sh` | `user_add_group` `group_ensure` `user_home` `user_in_group` `user_mkdir` `user_install_file` `user_write_file` (archivos del usuario con el dueño correcto) |
+| `boot.sh` | `cmdline_add` `mkinitcpio_add` `uki_rebuild` |
 
 Las funciones de `files.sh` hacen un backup (`archivo.bak-<fecha>`) antes del primer cambio de cada ejecución. Después dejan `FILE_CHANGED=1` si el archivo cambió y `0` si no; así puedes, por ejemplo, regenerar el UKI solo cuando haga falta.
 
