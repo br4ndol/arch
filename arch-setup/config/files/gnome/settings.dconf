@@ -17,6 +17,9 @@ allow-volume-above-100-percent=true
 power-button-action='nothing'
 power-saver-profile-on-low-battery=true
 sleep-inactive-ac-type='nothing'
+# Solo con batería: suspende (y bloquea la sesión) tras 15 min sin uso.
+sleep-inactive-battery-type='suspend'
+sleep-inactive-battery-timeout=900
 idle-dim=false
 
 [org/gnome/desktop/session]

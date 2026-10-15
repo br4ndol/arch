@@ -17,6 +17,10 @@ module_run() {
   # Solo se habilita: arrancarlo ahora abriría la sesión gráfica en mitad del script.
   service_enable gdm.service
 
+  log_step "gnome-keyring"
+  # Socket: el demonio arranca solo cuando una app lo pide.
+  service_enable_global gnome-keyring-daemon.socket
+
   log_step "Ajustes por defecto (dconf)"
   write_file /etc/dconf/profile/user <<'EOF'
 user-db:user

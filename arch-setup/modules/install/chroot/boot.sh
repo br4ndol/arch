@@ -1,17 +1,19 @@
 #!/usr/bin/env bash
-# desc: cmdline, UKI con mkinitcpio y entrada de arranque EFI (EFISTUB)
+# desc: cmdline, UKI principal y de respaldo, y sus entradas de arranque EFI (EFISTUB)
 #
 # Ver ArchLinux2/kernel.md. Sin bootloader: el firmware arranca el UKI.
 #
-# Además del UKI y su entrada EFI, deja una copia en la ruta de respaldo UEFI
-# (\EFI\BOOT\BOOTX64.EFI), que el firmware arranca si pierde la entrada. Un post
-# hook de mkinitcpio la mantiene al día en cada actualización del kernel.
+# Genera dos UKI (preset con 'default' y 'fallback', cada uno con su entrada EFI)
+# y deja una copia del principal en la ruta de respaldo UEFI
+# (\EFI\BOOT\BOOTX64.EFI), que el firmware arranca si pierde las entradas. Un
+# post hook de mkinitcpio mantiene esa copia al día en cada actualización.
 
 POST_HOOK=/etc/initcpio/post/arch-setup-uki-fallback
-FALLBACK=/efi/EFI/BOOT/BOOTX64.EFI
+BOOTX64=/efi/EFI/BOOT/BOOTX64.EFI
 
 module_run() {
-  local uki="/efi/EFI/Linux/arch-$KERNEL.efi" root_uuid rebuild=0
+  local uki="/efi/EFI/Linux/arch-$KERNEL.efi" uki_fb="/efi/EFI/Linux/arch-$KERNEL-fallback.efi"
+  local root_uuid rebuild=0
 
   is_mounted /efi || die "/efi no está montada"
   [[ -f /boot/vmlinuz-$KERNEL ]] || die "No existe /boot/vmlinuz-$KERNEL (¿se instaló el kernel?)"
@@ -31,11 +33,11 @@ module_run() {
   # Se instala antes de generar el UKI: mkinitcpio la mantiene al día desde ahora.
   render_template "$CONFIG_DIR/files/uki-fallback.hook" "$POST_HOOK" 755
 
-  log_step "UKI"
-  if ((rebuild)) || [[ ! -f $uki ]]; then
+  log_step "UKI principal y de respaldo"
+  if ((rebuild)) || [[ ! -f $uki || ! -f $uki_fb ]]; then
     run mkinitcpio -p "$KERNEL"
   else
-    log_ok "Ya generado: $uki"
+    log_ok "Ya generados: $uki y $uki_fb"
   fi
   # Los initramfs clásicos que dejó pacstrap ya no se usan.
   local img
@@ -44,13 +46,15 @@ module_run() {
   done
 
   # Por si el UKI ya existía y no se regeneró (el hook solo actúa al regenerar).
-  if [[ -f $uki ]] && ! same_content "$uki" "$FALLBACK"; then
-    run mkdir -p -- "${FALLBACK%/*}"
-    run cp -f -- "$uki" "$FALLBACK"
-    log_ok "Copiado a $FALLBACK"
+  if [[ -f $uki ]] && ! same_content "$uki" "$BOOTX64"; then
+    run mkdir -p -- "${BOOTX64%/*}"
+    run cp -f -- "$uki" "$BOOTX64"
+    log_ok "Copiado a $BOOTX64"
   fi
 
-  log_step "Entrada de arranque EFI"
+  log_step "Entradas de arranque EFI"
+  # efibootmgr pone la última creada al principio: la principal va al final.
+  _ensure_uefi_entry "Arch Linux (${KERNEL#linux-} fallback)" "\\EFI\\Linux\\arch-$KERNEL-fallback.efi"
   _ensure_uefi_entry "Arch Linux (${KERNEL#linux-})" "\\EFI\\Linux\\arch-$KERNEL.efi"
 }
 

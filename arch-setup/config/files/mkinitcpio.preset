@@ -2,7 +2,12 @@
 ALL_config="/etc/mkinitcpio.conf"
 ALL_kver="/boot/vmlinuz-{{KERNEL}}"
 
-PRESETS=('default')
+PRESETS=('default' 'fallback')
 
 default_uki="/efi/EFI/Linux/arch-{{KERNEL}}.efi"
 default_options=""
+
+# Respaldo: initramfs genérico (sin autodetect, con todos los módulos). Arranca
+# aunque un cambio en MODULES o en el cmdline rompa el UKI principal.
+fallback_uki="/efi/EFI/Linux/arch-{{KERNEL}}-fallback.efi"
+fallback_options="-S autodetect"

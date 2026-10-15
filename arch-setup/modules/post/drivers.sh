@@ -37,8 +37,9 @@ _nvidia() {
 
   log_step "Servicios"
   service_enable --now switcheroo-control.service nvidia-powerd.service
-  # Estos se ejecutan al suspender/reanudar: solo se habilitan, nunca se arrancan.
-  service_enable nvidia-suspend.service nvidia-resume.service nvidia-hibernate.service
+  # Se ejecutan al suspender/reanudar: solo se habilitan, nunca se arrancan.
+  # nvidia-hibernate no: sin swap en disco no hay hibernación.
+  service_enable nvidia-suspend.service nvidia-resume.service
 
   log_step "Hook de pacman (regenera el UKI al actualizar el driver)"
   render_template "$CONFIG_DIR/files/nvidia.hook" /etc/pacman.d/hooks/nvidia.hook

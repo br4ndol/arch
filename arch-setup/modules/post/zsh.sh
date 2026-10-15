@@ -44,4 +44,9 @@ module_run() {
   if [[ ! -d /root/.local/share/zsh/plugins/fzf-tab/.git ]]; then
     retry 3 5 git clone --depth 1 "$FZF_TAB_URL" /root/.local/share/zsh/plugins/fzf-tab
   fi
+  # Sin esto, root sigue con bash y su configuración nunca se carga.
+  if [[ $(getent passwd root | cut -d: -f7) != */zsh ]]; then
+    run usermod -s /bin/zsh root
+    log_ok "Shell de root cambiada a zsh"
+  fi
 }

@@ -15,6 +15,7 @@ post_modules() {
   POST_MODULES=(
     mirrors     # rate-mirrors + mirror-update
     auth        # pwfeedback y faillock
+    maintenance # fstrim.timer + hook de paccache
     zram        # swap en RAM
     aur         # yay
     drivers     # vídeo según GPU (none en VM)

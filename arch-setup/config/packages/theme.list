@@ -4,11 +4,11 @@ adw-gtk-theme
 bibata-cursor-theme              # chaotic-aur (incluye Bibata-Modern-Classic)
 aur:morewaita-icon-theme-git     # iconos MoreWaita (solo en AUR)
 
-# Qt: se configura con qt5ct/qt6ct (QT_QPA_PLATFORMTHEME=qt5ct).
+# Qt sigue a GNOME con el tema "gtk3" que ya traen qt5-base y qt6-base
+# (QT_QPA_PLATFORMTHEME=gtk3): no hace falta qt5ct/qt6ct.
 # Quitados a propósito (no compilan / chocan con qt5-wayland de CachyOS):
 # qgnomeplatform-qt5, qgnomeplatform-qt6, qadwaitadecorations-qt5.
-qt5ct qt6ct
-qadwaitadecorations-qt6          # chaotic-aur, precompilado
+qadwaitadecorations-qt6          # chaotic-aur; bordes Adwaita en apps Qt6 (Wayland)
 
 # Tema adw-gtk3 para apps Flatpak
 flatpak:org.gtk.Gtk3theme.adw-gtk3

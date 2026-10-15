@@ -23,7 +23,7 @@ Principios:
 | --- | --- | --- |
 | install · live | `preflight` `settings` `repos` `disk` `pacstrap` | Probado en VM |
 | install · chroot | `system` `users` `network` `boot` | Probado en VM |
-| post | `mirrors` `auth` `zram` `aur` `drivers` `audio` `bluetooth` `plymouth` `zsh` `desktop/gnome` | Probado en VM |
+| post | `mirrors` `auth` `maintenance` `zram` `aur` `drivers` `audio` `bluetooth` `plymouth` `zsh` `desktop/gnome` | Probado en VM |
 | post | `asus` `theme` `nautilus` `dotfiles` | Probado en VM |
 | — | `gaming` | Fuera del script a propósito: se instala a mano (ver `ArchLinux2/gaming.md`) |
 
@@ -67,7 +67,9 @@ Antes de formatear tienes que escribir `FORMATEAR`. Esa confirmación no se salt
 
 Al terminar, desmonta con `umount -R /mnt`, quita la ISO y reinicia. El firmware arranca directamente el UKI (`/efi/EFI/Linux/arch-linux-cachyos-bore.efi`) desde la entrada EFI "Arch Linux (cachyos-bore)".
 
-Además hay una copia del UKI en la ruta de respaldo UEFI `\EFI\BOOT\BOOTX64.EFI`. El firmware la arranca si pierde la entrada (al resetear la BIOS, al actualizar el firmware o en VirtualBox, que las olvida). Un post hook de mkinitcpio (`/etc/initcpio/post/arch-setup-uki-fallback`) la actualiza cada vez que se regenera el UKI.
+También se genera un **UKI de respaldo** (`arch-linux-cachyos-bore-fallback.efi`, con todos los módulos y sin `autodetect`) con su propia entrada, "Arch Linux (cachyos-bore fallback)". Elígela en el menú de arranque del firmware si un cambio en `MODULES` o en el cmdline rompe el principal.
+
+Además hay una copia del UKI principal en la ruta de respaldo UEFI `\EFI\BOOT\BOOTX64.EFI`. El firmware la arranca si pierde la entrada (al resetear la BIOS, al actualizar el firmware o en VirtualBox, que las olvida). Un post hook de mkinitcpio (`/etc/initcpio/post/arch-setup-uki-fallback`) la actualiza cada vez que se regenera el UKI.
 
 ## Uso en el sistema instalado
 

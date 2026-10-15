@@ -2,6 +2,7 @@
 
 gnome-shell gdm gnome-control-center gnome-backgrounds gnome-disk-utility gnome-tweaks
 gnome-bluetooth-3.0
+gnome-keyring                    # contraseñas de apps; GDM lo desbloquea al iniciar sesión
 ghostty ocean-sound-theme ddcutil
 noto-fonts noto-fonts-cjk noto-fonts-emoji
 

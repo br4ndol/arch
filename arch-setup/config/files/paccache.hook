@@ -1,0 +1,16 @@
+# Instalado por arch-setup (modules/post/maintenance.sh).
+# Tras cada operación de pacman limpia la caché: deja las 3 últimas versiones
+# de cada paquete instalado y borra las de paquetes ya desinstalados.
+# Sin servicios ni temporizadores.
+[Trigger]
+Operation = Install
+Operation = Upgrade
+Operation = Remove
+Type = Package
+Target = *
+
+[Action]
+Description = Limpiando la caché de pacman...
+When = PostTransaction
+Depends = pacman-contrib
+Exec = /bin/sh -c '/usr/bin/paccache -rqk3; /usr/bin/paccache -rquk0'
