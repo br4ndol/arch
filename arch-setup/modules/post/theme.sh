@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# desc: Tema oscuro adw-gtk3, cursor Bibata y Qt con aspecto GNOME
+# desc: Tema oscuro adw-gtk3, iconos MoreWaita, cursor Bibata y Qt (qt5ct)
 #
 # Ver ArchLinux2/Theme.md. El settings.ini de GTK4 lo copia el módulo dotfiles.
 
@@ -7,7 +7,7 @@ module_run() {
   log_step "Paquetes"
   install_list "$CONFIG_DIR/packages/theme.list"
 
-  log_step "Tema y cursor por defecto (dconf)"
+  log_step "Tema, iconos y cursor por defecto (dconf)"
   if cmd_exists dconf && [[ -d /etc/dconf/db/local.d ]]; then
     install_file "$CONFIG_DIR/files/gnome/theme.dconf" /etc/dconf/db/local.d/20-arch-setup-theme
     if ((FILE_CHANGED)); then run dconf update; fi

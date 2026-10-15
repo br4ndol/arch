@@ -43,6 +43,8 @@ module_run() {
   fi
 
   log_step "pacman.conf"
+  ensure_uncommented "$PACMAN_CONF" Color
+  ensure_line_after "$PACMAN_CONF" ILoveCandy Color
   set_kv "$PACMAN_CONF" Architecture 'x86_64 x86_64_v3'
   # Los v3 van antes de [core] para que tengan prioridad.
   for repo in cachyos-v3 cachyos-core-v3 cachyos-extra-v3; do

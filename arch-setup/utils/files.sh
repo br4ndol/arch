@@ -83,6 +83,27 @@ ensure_line() {
   _apply_candidate "$file" "$cand"
 }
 
+# ensure_line_after ARCHIVO LINEA ANCLA — Garantiza LINEA justo después de la
+# primera línea igual a ANCLA (para claves que deben quedar en su sección, como
+# ILoveCandy en [options] de pacman.conf). Si LINEA ya existe, no hace nada.
+ensure_line_after() {
+  local file=$1 line=$2 anchor=$3 cand
+  FILE_CHANGED=0
+  if [[ -f $file ]] && grep -qxF -- "$line" "$file"; then
+    log_debug "Ya presente en $file: $line"
+    return 0
+  fi
+  if [[ ! -f $file ]] || ! grep -qxF -- "$anchor" "$file"; then
+    die "ensure_line_after: no encuentro '$anchor' en $file"
+  fi
+  cand=$(_candidate)
+  _L=$line _A=$anchor awk '
+    { print }
+    !done && $0 == ENVIRON["_A"] { print ENVIRON["_L"]; done = 1 }
+  ' "$file" >"$cand"
+  _apply_candidate "$file" "$cand"
+}
+
 # set_kv ARCHIVO CLAVE VALOR [SEPARADOR] — Fija CLAVE<SEP>VALOR.
 #   - Si la clave está activa, reemplaza su valor.
 #   - Si no, descomenta la primera línea comentada con esa clave.

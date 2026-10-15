@@ -2,6 +2,7 @@
 
 adw-gtk-theme
 bibata-cursor-theme              # chaotic-aur (incluye Bibata-Modern-Classic)
+aur:morewaita-icon-theme-git     # iconos MoreWaita (solo en AUR)
 
 # Qt: se configura con qt5ct/qt6ct (QT_QPA_PLATFORMTHEME=qt5ct).
 # Quitados a propósito (no compilan / chocan con qt5-wayland de CachyOS):
