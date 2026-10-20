@@ -1,0 +1,20 @@
+# gaming.list — Juegos (ArchLinux2/gaming.md). Solo con GAMING=yes.
+# Los drivers de 32 bits (lib32-mesa, lib32-vulkan-intel, lib32-nvidia-utils)
+# los pone el módulo drivers.
+
+steam steam-devices gamescope
+
+# Rendimiento y overlay
+gamemode lib32-gamemode
+mangohud lib32-mangohud goverlay
+vkbasalt lib32-vkbasalt          # chaotic-aur
+
+# Proton fuera de Steam. La variante SLR es la que Faugus reconoce como
+# "Proton-CachyOS (System)"; Steam también la ve (/usr/share/steam/compatibilitytools.d).
+# Faugus desde el repo y no Flatpak: el Flatpak no ve /usr/share.
+proton-cachyos-slr               # cachyos / chaotic-aur
+faugus-launcher                  # cachyos / chaotic-aur
+umu-launcher protontricks        # protontricks ya trae winetricks
+
+# Dependencias que piden muchos juegos
+cabextract ttf-liberation openal lib32-gtk3 lib32-ocl-icd

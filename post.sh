@@ -30,6 +30,7 @@ post_modules() {
     theme       # adw-gtk3 claro/oscuro, cursor Bibata, Qt
     nautilus    # extras, marcador, carpetas XDG, Samba
     apps        # Brave Origin, VSCodium y AppImages (fuse2 + Gear Lever)
+    gaming      # opcional (GAMING): Steam, Proton-CachyOS, Faugus, gamemode…
     dotfiles    # config/files/home -> ~ (Ghostty, Fastfetch)
     cleanup     # al final: huérfanos, caché de pacman, yay y Flatpak
   )
@@ -65,6 +66,19 @@ main() {
   [[ -n $SYS_USER && $SYS_USER != root ]] || die "Define SYS_USER en settings o ejecuta con sudo desde tu usuario"
   user_exists "$SYS_USER" || die "No existe el usuario '$SYS_USER'"
   export SYS_USER
+
+  # gaming es opcional. Se decide aquí, antes de empezar, para no preguntar a
+  # mitad de la instalación. --only gaming cuenta como un sí; --yes, como un no.
+  if _module_selected gaming && [[ -z ${GAMING:-} ]]; then
+    if ((${#ONLY_MODULES[@]})); then
+      GAMING=yes
+    elif ! ((ASSUME_YES)) && confirm "¿Instalar también gaming (Steam, Proton-CachyOS, Faugus…)?" n; then
+      GAMING=yes
+    else
+      GAMING=no
+    fi
+  fi
+  export GAMING
 
   log_section "arch-setup · post-instalación (usuario: $SYS_USER, escritorio: ${DESKTOP:-ninguno}, GPU: ${GPU:-none})"
   run_modules "$MODULES_DIR/post" "${POST_MODULES[@]}" || exit 1

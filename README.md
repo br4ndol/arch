@@ -26,7 +26,7 @@ Las dos fases están completas y probadas desde cero en una VM de VirtualBox (UE
 - `asusctl` y `rog-control-center`;
 - el brillo del monitor externo con `ddcutil`.
 
-**Fuera del script a propósito:** gaming. Se instala a mano siguiendo `ArchLinux2/gaming.md`.
+**Opcional:** gaming (`ArchLinux2/gaming.md`). `post.sh` pregunta al principio si instalarlo.
 
 ## Qué hace cada módulo
 
@@ -69,6 +69,7 @@ Las dos fases están completas y probadas desde cero en una VM de VirtualBox (UE
 | `theme` | adw-gtk3 (oscuro por defecto), iconos MoreWaita (`-git`), cursor Bibata, y Qt con el tema `gtk3` |
 | `nautilus` | Extras, carpetas XDG sin Plantillas ni Público, marcadores (Descargas, Imágenes, Documentos, "File System") y Samba |
 | `apps` | Brave Origin, VSCodium y AppImages (`fuse2` + Gear Lever) |
+| `gaming` | **Opcional.** Steam, gamescope, gamemode (con aviso), MangoHud, vkBasalt, Proton-CachyOS (SLR), Faugus Launcher y NTSYNC |
 | `dotfiles` | Copia `config/files/home/` a tu HOME (Ghostty, Fastfetch) |
 | `cleanup` | Al final: quita dependencias huérfanas y vacía la caché de pacman, la de yay y los runtimes Flatpak sin usar |
 
@@ -141,6 +142,7 @@ Sin esa copia (por ejemplo, en un sistema instalado a mano): `curl -L github.com
 - **Escritorio:** `DESKTOP` en `settings.conf` elige el módulo `desktop/<nombre>`.
 - **Ajustes de GNOME:** se instalan como valores **por defecto** del sistema (dconf, en `/etc/dconf/db/local.d/`). No hace falta tener la sesión abierta y luego puedes cambiarlos desde Configuración. Si ya elegiste otro valor en tu sesión, el tuyo tiene prioridad. Para volver al del script: `gsettings reset <schema> <clave>`.
 - **Energía:** con cargador no se suspende nunca. Con batería se suspende (y bloquea) a los 15 minutos sin uso.
+- **Gaming:** al empezar, `post.sh` pregunta si instalarlo (por defecto no; con `--yes`, no). Para no responder, pon `GAMING=yes` o `GAMING=no` en `settings.conf`. `sudo ./post.sh --only gaming` lo instala directamente. Necesita los drivers de vídeo: con `GPU=none` se omite. Proton-CachyOS se instala desde el repo (variante SLR): Steam lo muestra en la lista de Proton y Faugus como "Proton-CachyOS (System)". Lo que sigue siendo manual: los argumentos de lanzamiento (`ENABLE_VKBASALT=1 prime-run gamemoderun mangohud %command%`; `prime-run` solo en modo híbrido) y el modo de compatibilidad de enfoque de los menús de Steam.
 - **Atajos de brillo:** solo se crean si defines `MONITOR_SERIAL` (lo ves con `ddcutil detect`).
 - **Tema claro/oscuro:** arranca en oscuro. El botón "Estilo oscuro" del panel cambia al momento las apps GTK4/libadwaita. Para que las GTK3, Flatpak y Qt cambien también (`adw-gtk3` ↔ `adw-gtk3-dark`), instala a mano desde extensions.gnome.org la extensión *Legacy (GTK3) Theme Scheme Auto Switcher* (el script no instala extensiones). Las apps Qt toman el tema al abrirse.
 - **mirror-update:** `rate-mirrors` no se deja ejecutar como root, así que el script lo lanza como el usuario que llamó a `sudo` y solo escribe los mirrorlists como root.
