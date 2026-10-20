@@ -5,6 +5,8 @@ gnome-bluetooth-3.0
 gnome-keyring                    # contraseñas de apps; GDM lo desbloquea al iniciar sesión
 ghostty ocean-sound-theme ddcutil
 noto-fonts noto-fonts-cjk noto-fonts-emoji
+gnome-browser-connector          # instalar extensiones desde extensions.gnome.org
+gnome-extensions-app             # gestionar las extensiones instaladas
 
 # Apps (Flathub)
 flatpak:org.gnome.Calculator

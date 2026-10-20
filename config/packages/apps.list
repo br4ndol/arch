@@ -1,0 +1,9 @@
+# apps.list — Apps de uso diario (módulo apps)
+
+brave-origin-bin                 # cachyos / chaotic-aur
+vscodium                         # cachyos / chaotic-aur
+
+# AppImages: casi todas piden libfuse.so.2. "fuse" a secas es un alias de
+# fuse2; se pone el nombre real para que la comprobación de instalado funcione.
+fuse2
+flatpak:it.mijorus.gearlever     # integra las AppImages en el menú (~/AppImages)

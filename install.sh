@@ -24,6 +24,7 @@ LIVE_MODULES=(
 CHROOT_MODULES=(
   system      # zona horaria, locale, teclado, hostname
   users       # usuario + wheel/sudo, contraseña de usuario y root
+  repo        # copia del repo en ~/arch para ejecutar post.sh al arrancar
   network     # NetworkManager + iwd
   boot        # cmdline, UKI y entrada EFI (va al final: el UKI incluye lo anterior)
 )
@@ -99,6 +100,7 @@ main() {
         cp -f -- "$LOG_FILE" "$TARGET/var/log/arch-setup-live.log" 2>/dev/null || true
       fi
       log_ok "Instalación terminada. Para arrancar el sistema nuevo: umount -R $TARGET, quita la ISO y reinicia."
+      log_ok "Después, entra con tu usuario y ejecuta: cd ~/arch && sudo ./post.sh"
       ;;
     chroot)
       in_chroot || die "--stage chroot es interno: debe ejecutarse dentro de arch-chroot"

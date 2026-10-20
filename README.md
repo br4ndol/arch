@@ -14,7 +14,7 @@ Dos fases:
 Principios:
 
 - **Idempotente:** se puede ejecutar las veces que haga falta. Cada paso comprueba antes de actuar y lo que ya está hecho se salta.
-- **Sistema limpio:** solo instala lo listado en `config/packages/`. Al instalar desde AUR borra las dependencias de compilación (`--removemake`). Al terminar la instalación borra su propia copia del sistema nuevo.
+- **Sistema limpio:** solo instala lo listado en `config/packages/`. Al instalar desde AUR borra las dependencias de compilación (`--removemake`). Al terminar la instalación borra su copia temporal de `/root`, y `post.sh` acaba con una limpieza (huérfanos y cachés).
 - **Simple de cambiar:** un archivo por tarea. La lógica va en `modules/` y los datos en `config/`.
 
 ## Estado
@@ -46,6 +46,7 @@ Las dos fases están completas y probadas desde cero en una VM de VirtualBox (UE
 | --- | --- |
 | `system` | Zona horaria, locale, teclado y hostname |
 | `users` | Crea el usuario en `wheel` con sudo, y pone la misma contraseña al usuario y a root |
+| `repo` | Deja una copia del repo en `~/arch` (con tus respuestas, menos el hash de la contraseña) para ejecutar `post.sh` nada más arrancar |
 | `network` | NetworkManager con iwd |
 | `boot` | Cmdline, UKI principal y de respaldo con sus entradas EFI, y la copia `BOOTX64.EFI` |
 
@@ -64,10 +65,12 @@ Las dos fases están completas y probadas desde cero en una VM de VirtualBox (UE
 | `asus` | `asusctl`, `rog-control-center` y `power-profiles-daemon` |
 | `plymouth` | Tema `bgrt` y `quiet splash …` en el cmdline |
 | `zsh` | Starship, plugins y fzf-tab. Root también usa zsh, con su propia copia de la configuración |
-| `desktop/gnome` | GNOME, GDM, `gnome-keyring`, apps Flatpak, y ajustes y atajos por defecto |
-| `theme` | adw-gtk3 oscuro, iconos MoreWaita (`-git`), cursor Bibata, y Qt con el tema `gtk3` |
-| `nautilus` | Extras, el marcador "File System", carpetas XDG y Samba |
-| `dotfiles` | Copia `config/files/home/` a tu HOME (Ghostty, Fastfetch, GTK4) |
+| `desktop/gnome` | GNOME, GDM, `gnome-keyring`, `gnome-browser-connector`, `gnome-extensions-app`, apps Flatpak, y ajustes y atajos por defecto |
+| `theme` | adw-gtk3 (oscuro por defecto), iconos MoreWaita (`-git`), cursor Bibata, y Qt con el tema `gtk3` |
+| `nautilus` | Extras, carpetas XDG sin Plantillas ni Público, marcadores (Descargas, Imágenes, Documentos, "File System") y Samba |
+| `apps` | Brave Origin, VSCodium y AppImages (`fuse2` + Gear Lever) |
+| `dotfiles` | Copia `config/files/home/` a tu HOME (Ghostty, Fastfetch) |
+| `cleanup` | Al final: quita dependencias huérfanas y vacía la caché de pacman, la de yay y los runtimes Flatpak sin usar |
 
 ## Uso en la ISO
 
@@ -116,7 +119,7 @@ Las respuestas se guardan en `config/settings.local.conf`. En las siguientes eje
 
 Antes de formatear tienes que escribir `FORMATEAR`. Esa confirmación no se salta ni con `--yes`.
 
-Al terminar, desmonta con `umount -R /mnt`, quita la ISO y reinicia. El firmware arranca directamente el UKI (`/efi/EFI/Linux/arch-linux-cachyos-bore.efi`) desde la entrada EFI "Arch Linux (cachyos-bore)".
+Al terminar, desmonta con `umount -R /mnt`, quita la ISO y reinicia. El repo queda copiado en `~/arch` de tu usuario, listo para la fase 2. El firmware arranca directamente el UKI (`/efi/EFI/Linux/arch-linux-cachyos-bore.efi`) desde la entrada EFI "Arch Linux (cachyos-bore)".
 
 También se genera un **UKI de respaldo** (`arch-linux-cachyos-bore-fallback.efi`, con todos los módulos y sin `autodetect`) con su propia entrada, "Arch Linux (cachyos-bore fallback)". Elígela en el menú de arranque del firmware si un cambio en `MODULES` o en el cmdline rompe el principal.
 
@@ -127,20 +130,20 @@ Además hay una copia del UKI principal en la ruta de respaldo UEFI `\EFI\BOOT\B
 Inicia sesión con tu usuario (en la TTY, todavía sin escritorio) y ejecuta:
 
 ```bash
-sudo pacman -S git            # el módulo zsh lo instala igualmente
-git clone https://github.com/br4ndol/arch
-cd arch && sudo ./post.sh
+cd ~/arch && sudo ./post.sh
 ```
 
-O con `curl`: `curl -L github.com/br4ndol/arch/archive/main.tar.gz | tar xz && cd arch-main && sudo ./post.sh`.
+`install.sh` dejó ahí la misma versión con la que instalaste, junto con tus respuestas (`settings.local.conf` sin el hash de la contraseña), así que `drivers` ya sabe qué GPU elegiste. Si la instalaste con `git clone`, la copia conserva `.git`: tras el módulo `zsh` (que instala `git`), `cd ~/arch && git pull` la pone al día.
 
-Al usar `git clone`, para tener la última versión del script más adelante basta con `cd arch && git pull`.
+Sin esa copia (por ejemplo, en un sistema instalado a mano): `curl -L github.com/br4ndol/arch/archive/main.tar.gz | tar xz && cd arch-main && sudo ./post.sh`.
 
-- **Drivers de vídeo:** como `settings.local.conf` no se queda en el sistema, el módulo `drivers` vuelve a preguntar (`nvidia-hybrid`, `intel` o `none`, detectado automáticamente). Para no tener que responder, pon `GPU=` en `config/settings.conf`.
+- **Drivers de vídeo:** si no hay `settings.local.conf` (descarga nueva), el módulo `drivers` vuelve a preguntar (`nvidia-hybrid`, `intel` o `none`, detectado automáticamente). Para no tener que responder, pon `GPU=` en `config/settings.conf`.
 - **Escritorio:** `DESKTOP` en `settings.conf` elige el módulo `desktop/<nombre>`.
 - **Ajustes de GNOME:** se instalan como valores **por defecto** del sistema (dconf, en `/etc/dconf/db/local.d/`). No hace falta tener la sesión abierta y luego puedes cambiarlos desde Configuración. Si ya elegiste otro valor en tu sesión, el tuyo tiene prioridad. Para volver al del script: `gsettings reset <schema> <clave>`.
 - **Energía:** con cargador no se suspende nunca. Con batería se suspende (y bloquea) a los 15 minutos sin uso.
 - **Atajos de brillo:** solo se crean si defines `MONITOR_SERIAL` (lo ves con `ddcutil detect`).
+- **Tema claro/oscuro:** arranca en oscuro. El botón "Estilo oscuro" del panel cambia al momento las apps GTK4/libadwaita. Para que las GTK3, Flatpak y Qt cambien también (`adw-gtk3` ↔ `adw-gtk3-dark`), instala a mano desde extensions.gnome.org la extensión *Legacy (GTK3) Theme Scheme Auto Switcher* (el script no instala extensiones). Las apps Qt toman el tema al abrirse.
+- **mirror-update:** `rate-mirrors` no se deja ejecutar como root, así que el script lo lanza como el usuario que llamó a `sudo` y solo escribe los mirrorlists como root.
 
 Al terminar, reinicia: GDM arranca y entras a GNOME.
 
@@ -181,7 +184,7 @@ Si un módulo falla, el resumen final te dice el `--only` para repetir solo ese.
   ```
 
 - **`config/files/`**: plantillas de archivos que se copian al sistema. Pueden usar `{{VARIABLE}}`, que se sustituye por el valor de `settings.conf`.
-- **`config/files/home/`**: refleja tu HOME. El módulo `dotfiles` copia cada archivo a la misma ruta dentro de `~`, a tu nombre. Por ejemplo, `config/files/home/.config/ghostty/config.ghostty` acaba en `~/.config/ghostty/config.ghostty`. Ahí están las configs de Ghostty, Fastfetch (con el logo) y GTK4; para añadir otra, solo déjala en esa carpeta.
+- **`config/files/home/`**: refleja tu HOME. El módulo `dotfiles` copia cada archivo a la misma ruta dentro de `~`, a tu nombre. Por ejemplo, `config/files/home/.config/ghostty/config.ghostty` acaba en `~/.config/ghostty/config.ghostty`. Ahí están las configs de Ghostty y Fastfetch (con el logo); para añadir otra, solo déjala en esa carpeta.
 
 ## Estructura
 

@@ -27,9 +27,11 @@ post_modules() {
   )
   [[ -z ${DESKTOP:-} ]] || POST_MODULES+=("desktop/$DESKTOP")
   POST_MODULES+=(
-    theme       # adw-gtk3 oscuro, cursor Bibata, Qt
+    theme       # adw-gtk3 claro/oscuro, cursor Bibata, Qt
     nautilus    # extras, marcador, carpetas XDG, Samba
-    dotfiles    # config/files/home -> ~ (Ghostty, Fastfetch, GTK4)
+    apps        # Brave Origin, VSCodium y AppImages (fuse2 + Gear Lever)
+    dotfiles    # config/files/home -> ~ (Ghostty, Fastfetch)
+    cleanup     # al final: huérfanos, caché de pacman, yay y Flatpak
   )
 }
 

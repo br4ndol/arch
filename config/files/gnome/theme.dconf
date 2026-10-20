@@ -1,5 +1,10 @@
 # Tema de GNOME (ArchLinux2/Theme.md). Valores POR DEFECTO del sistema, como
 # settings.dconf: cada usuario puede cambiarlos luego.
+#
+# Arranca en oscuro. El botón "Estilo oscuro" del panel solo cambia
+# color-scheme; para que las apps GTK3, Flatpak y Qt cambien también entre
+# adw-gtk3 y adw-gtk3-dark hace falta una extensión (p. ej. Legacy (GTK3) Theme
+# Scheme Auto Switcher), que se instala a mano desde extensions.gnome.org.
 
 [org/gnome/desktop/interface]
 gtk-theme='adw-gtk3-dark'

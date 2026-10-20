@@ -13,10 +13,20 @@ files=(
   /etc/pacman.d/chaotic-mirrorlist
 )
 
+# rate-mirrors se niega a correr como root: se lanza como el usuario que llamó
+# a sudo y, si no hay ninguno (root directo), con --allow-root.
+rate() {
+  if [[ -n ${SUDO_USER:-} && $SUDO_USER != root ]]; then
+    runuser -u "$SUDO_USER" -- rate-mirrors "$@"
+  else
+    rate-mirrors --allow-root "$@"
+  fi
+}
+
 rank() {   # uso: rank <repo> <destino>
   local tmp
   tmp=$(mktemp) || return 1
-  if rate-mirrors --protocol=https --disable-comments "$1" > "$tmp" && [[ -s $tmp ]]; then
+  if rate --protocol=https --disable-comments "$1" > "$tmp" && [[ -s $tmp ]]; then
     install -m 644 "$tmp" "$2"
   else
     echo "!! rate-mirrors $1 falló; se conserva $2" >&2
