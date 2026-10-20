@@ -8,7 +8,7 @@ Aura Effect        | XF86Launch3                 | asusctl aura effect --next-mo
 Power Plan         | XF86Launch4                 | asusctl profile next
 Emoji              | <Alt><Super>e               | flatpak run it.mijorus.smile
 Terminal           | <Super>q                    | ghostty
-Resources          | <Shift><Control>Escape      | flatpak run net.nokyan.Resources
+Mission Center     | <Shift><Control>Escape      | flatpak run io.missioncenter.MissionCenter
 Screenshots        | <Shift><Super>s             | flatpak run be.alexandervanhee.gradia --screenshot=INTERACTIVE
 Brightness Up      | <Control>XF86MonBrightnessUp   | ddcutil --sn {{MONITOR_SERIAL}} setvcp 10 + 10
 Brightness Down    | <Control>XF86MonBrightnessDown | ddcutil --sn {{MONITOR_SERIAL}} setvcp 10 - 10

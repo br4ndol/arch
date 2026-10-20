@@ -15,7 +15,6 @@ flatpak:be.alexandervanhee.gradia
 flatpak:it.mijorus.smile
 flatpak:io.github.realmazharhussain.GdmSettings
 flatpak:page.codeberg.libre_menu_editor.LibreMenuEditor
-flatpak:org.onlyoffice.desktopeditors
 flatpak:com.github.tchx84.Flatseal
 flatpak:ca.desrt.dconf-editor
-flatpak:net.nokyan.Resources
+flatpak:io.missioncenter.MissionCenter
