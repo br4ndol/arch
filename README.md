@@ -60,7 +60,7 @@ Las dos fases están completas y probadas desde cero en una VM de VirtualBox (UE
 | `zram` | 8 GiB comprimidos con zstd y `zswap.enabled=0` |
 | `aur` | `yay` desde chaotic-aur |
 | `drivers` | Intel, o Intel + Nvidia, según `GPU`. Con `none` no hace nada |
-| `audio` | PipeWire |
+| `audio` | PipeWire, EasyEffects (Flatpak) y los presets de JackHack96 (Perfect EQ, bass, Dolby Atmos, Laptop…) con sus `.irs` |
 | `bluetooth` | BlueZ |
 | `asus` | `asusctl`, `rog-control-center` y `power-profiles-daemon` |
 | `plymouth` | Tema `bgrt` y `quiet splash …` en el cmdline |

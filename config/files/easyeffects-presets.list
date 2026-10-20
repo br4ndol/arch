@@ -1,0 +1,43 @@
+# Presets de EasyEffects (ArchLinux2/Audio.md): los mismos que la opción
+# "1) Install all presets" del install.sh de JackHack96/EasyEffects-Presets,
+# pero descargados como archivos sueltos, sin ejecutar ningún script remoto.
+# Formato: destino | URL (si falta la URL: el repo de JackHack96 + el nombre;
+# output/ va a la raíz del repo, irs/ a su carpeta irs/).
+# El destino es relativo a ~/.var/app/com.github.wwmm.easyeffects/data/easyeffects/
+
+output/Perfect EQ.json
+output/Bass Enhancing + Perfect EQ.json
+output/Bass Enhancing + Perfect EQ - Low Latency.json
+output/Boosted.json
+output/Bass Boosted.json
+output/Advanced Auto Gain.json
+output/Loudness+Autogain.json
+output/Dolby Atmos.json
+output/Speaker Sync.json
+output/Laptop.json | https://raw.githubusercontent.com/Digitalone1/EasyEffects-Presets/master/LoudnessEqualizer.json
+
+irs/Razor Surround ((48k Z-Edition)) 1.Stereo +0 Bass Low Latency.irs
+irs/Razor Surround ((48k Z-Edition)) 2.Stereo +20 bass.irs
+irs/Razor Surround ((48k Z-Edition)) 2.Stereo +20 bass Low Latency.irs
+irs/Razor Surround ((48k Z-Edition)) 3.Stereo +30 Bass Low Latency.irs
+irs/Razor Surround ((48k Z-Edition)) 4.Stereo +50 Bass Low Latency.irs
+irs/Razor Surround ((48k Z-Edition)) 5.Stereo +70 Bass Low Latency.irs
+irs/Razor Surround ((48k Z-Edition)) 6.Stereo +80 Bass Low Latency.irs
+irs/Razor Surround ((48k Z-Edition)) 7.Stereo +100 Bass Low Latency.irs
+irs/Accudio ((48kHz Z.E.)) Earpods HIFI.irs
+irs/Accudio ((48kHz Z.E.)) MDR-E9LP HIFI.irs
+irs/Accudio ((48kHz Z.E.)) MDR-E9LP SM SRH940.irs
+irs/Accudio ((48kHz Z.E.)) MDR-E9LP SM XBA3.irs
+irs/Accudio ((48kHz Z.E.)) MDR-E9LP SM beyerT1.irs
+irs/Accudio ((48kHz Z.E.)) MDR-XB500 HIFI.irs
+irs/Accudio ((48kHz Z.E.)) XBA-H3 HIFI.irs
+irs/Accudio ((48kHz Z.E.)) XBA-H3 SM SRH940.irs
+irs/Accudio ((48kHz Z.E.)) XBA-H3 SM XBA4.irs
+irs/Accudio ((48kHz Z.E.)) XBA-H3 SM beyerT1.irs
+irs/Creative X-Fi ((Z-Edition)) Crystalizer 10 + Expand 10.irs
+irs/Dolby ATMOS ((128K MP3)) 1.Default.irs
+irs/HTC Beats Audio ((Z-Edition)).irs
+irs/MaxxAudio Pro ((128K MP3)) 4.Music w MaxxSpace.irs
+irs/MaxxAudio Pro ((128K MP3)) 4.Music w MaxxSpace Low Latency.irs
+irs/Waves MaxxAudio ((Z-Edition)) AudioWizard 1.Music.irs
+irs/Waves MaxxAudio ((Z-Edition)) AudioWizard 1.Music Low Latency.irs

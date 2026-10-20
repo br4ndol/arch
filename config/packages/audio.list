@@ -5,3 +5,6 @@ lib32-pipewire lib32-pipewire-jack gst-plugin-pipewire
 alsa-utils alsa-ucm-conf sof-firmware
 rtkit realtime-privileges
 pavucontrol
+
+# Ecualizador y efectos (los presets los descarga el módulo audio)
+flatpak:com.github.wwmm.easyeffects
