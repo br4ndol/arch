@@ -5,7 +5,7 @@
 # asusd simplemente no hace nada sin hardware ASUS.
 
 module_run() {
-  log_step "Perfiles de energía"
+  log_step "Power profiles (power-profiles-daemon)"
   pkg_install power-profiles-daemon
   service_enable --now power-profiles-daemon.service
 

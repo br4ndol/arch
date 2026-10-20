@@ -8,7 +8,7 @@ module_run() {
   log_step "PipeWire y EasyEffects"
   install_list "$CONFIG_DIR/packages/audio.list"
 
-  log_step "Tiempo real para $SYS_USER"
+  log_step "Realtime para $SYS_USER (grupo realtime)"
   user_add_group "$SYS_USER" realtime
 
   log_step "Servicios de usuario"

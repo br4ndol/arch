@@ -13,7 +13,7 @@ nano
 networkmanager
 iwd                     # backend wifi de NetworkManager
 
-# Llaves y mirrorlists de los repos extra: sin ellos pacman falla en el
+# Keyrings y mirrorlists de los repos extra: sin ellos pacman falla en el
 # sistema nuevo (el problema de "Part2" en ArchLinux2/Servers.md).
 cachyos-keyring
 cachyos-mirrorlist

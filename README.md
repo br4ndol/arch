@@ -36,7 +36,7 @@ Las dos fases están completas y probadas desde cero en una VM de VirtualBox (UE
 | --- | --- |
 | `preflight` | Comprueba UEFI, internet, CPU x86-64-v3 y reloj NTP |
 | `settings` | Hace las preguntas iniciales y las guarda en `config/settings.local.conf` |
-| `repos` | Configura CachyOS v3 (antes de `[core]`), multilib, Chaotic-AUR y `[cachyos]`. Las llaves se verifican por huella, sin keyserver. Activa `Color` + `ILoveCandy` |
+| `repos` | Configura CachyOS v3 (antes de `[core]`), multilib, Chaotic-AUR y `[cachyos]`. Las keys se verifican por fingerprint, sin keyserver. Activa `Color` + `ILoveCandy` |
 | `disk` | Formatea la ESP (FAT32) y la raíz (ext4) y las monta en `/mnt` y `/mnt/efi` |
 | `pacstrap` | Instala el sistema base mínimo (`config/packages/base.list`) y genera `fstab` |
 
@@ -67,7 +67,7 @@ Las dos fases están completas y probadas desde cero en una VM de VirtualBox (UE
 | `zsh` | Starship, plugins y fzf-tab. Root también usa zsh, con su propia copia de la configuración |
 | `desktop/gnome` | GNOME, GDM, `gnome-keyring`, `gnome-browser-connector`, `gnome-extensions-app`, apps Flatpak, y ajustes y atajos por defecto |
 | `theme` | adw-gtk3 (oscuro por defecto), iconos MoreWaita (`-git`), cursor Bibata, y Qt con el tema `gtk3` |
-| `nautilus` | Extras, carpetas XDG sin Plantillas ni Público, marcadores (Descargas, Imágenes, Documentos, "File System") y Samba |
+| `nautilus` | Extras, carpetas XDG sin Templates ni Public, bookmarks (Downloads, Pictures, Documents, "File System") y Samba |
 | `apps` | Brave Origin, VSCodium y AppImages (`fuse2` + Gear Lever) |
 | `gaming` | **Opcional.** Steam, gamescope, gamemode (con aviso), MangoHud, vkBasalt, Proton-CachyOS (SLR), Faugus Launcher y NTSYNC |
 | `dotfiles` | Copia `config/files/home/` a tu HOME (Ghostty, Fastfetch) |

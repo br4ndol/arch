@@ -26,7 +26,7 @@ module_run() {
   else
     log_info "Paquetes: ${missing[*]}"
     # -P copia el pacman.conf de la ISO (repos ya configurados). Sin -K se copia
-    # también el keyring de la ISO, con las llaves de CachyOS/Chaotic firmadas.
+    # también el keyring de la ISO, con las keys de CachyOS/Chaotic firmadas.
     retry 2 10 pacstrap -P "$TARGET" --needed "${missing[@]}"
   fi
 

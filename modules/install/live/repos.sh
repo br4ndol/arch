@@ -4,7 +4,7 @@
 # Ver ArchLinux2/Servers.md. pacstrap copia luego este pacman.conf y el
 # keyring de la ISO al sistema nuevo.
 #
-# Las llaves NO se piden a un keyserver (keyserver.ubuntu.com falla a menudo):
+# Las keys NO se piden a un keyserver (keyserver.ubuntu.com falla a menudo):
 # se sacan del propio paquete *-keyring, descargado por HTTPS del mirror
 # oficial, y solo se aceptan si su huella completa coincide con estas.
 
@@ -26,11 +26,11 @@ module_run() {
   local -a urls
   mapfile -t urls < <(_cachyos_urls)
 
-  log_step "Llaves de CachyOS y Chaotic-AUR"
+  log_step "Keys de CachyOS y Chaotic-AUR"
   _trust_key "$CACHYOS_KEY" "${urls[0]}"
   _trust_key "$CHAOTIC_KEY" "${CHAOTIC_URLS[0]}"
 
-  log_step "Paquetes de llaves y mirrorlists"
+  log_step "Paquetes keyring y mirrorlist"
   if pkg_installed cachyos-keyring && pkg_installed cachyos-mirrorlist && pkg_installed cachyos-v3-mirrorlist; then
     log_ok "CachyOS: ya instalados"
   else
@@ -61,7 +61,7 @@ module_run() {
   retry 3 5 pacman -S --needed --noconfirm archlinux-keyring
 }
 
-# _trust_key HUELLA URL_KEYRING — Si la llave no está en el keyring de pacman,
+# _trust_key HUELLA URL_KEYRING — Si la key no está en el keyring de pacman,
 # la saca del paquete keyring, comprueba la huella, la añade y la firma localmente.
 _trust_key() {
   local fpr=$1 url=$2 dir="$RUN_TMPDIR/key-${1: -8}"
@@ -70,18 +70,18 @@ _trust_key() {
     mkdir -m 700 -- "$dir/gnupg"
     retry 3 5 curl -fsSL --max-time 60 -o "$dir/keyring.pkg.tar.zst" "$url"
     if ((DRY_RUN)); then
-      log_dry "Añadiría la llave $fpr sacada de ${url##*/}"
+      log_dry "Añadiría la key $fpr sacada de ${url##*/}"
     else
       bsdtar -xf "$dir/keyring.pkg.tar.zst" -C "$dir/pkg" 'usr/share/pacman/keyrings/*.gpg'
       gpg --homedir "$dir/gnupg" --quiet --import "$dir"/pkg/usr/share/pacman/keyrings/*.gpg 2>/dev/null
       gpg --homedir "$dir/gnupg" --list-keys "$fpr" >/dev/null 2>&1 ||
-        die "${url##*/} no contiene la llave $fpr (¿paquete alterado?)"
+        die "${url##*/} no contiene la key $fpr (¿paquete alterado?)"
       gpg --homedir "$dir/gnupg" --export "$fpr" >"$dir/key.gpg"
       run_quiet pacman-key --add "$dir/key.gpg"
     fi
   fi
   run_quiet pacman-key --lsign-key "$fpr"
-  log_ok "Llave de confianza: $fpr"
+  log_ok "Key de confianza: $fpr"
 }
 
 # _cachyos_urls — URLs de la última versión de cada paquete, leídas del listado

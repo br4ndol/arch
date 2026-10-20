@@ -30,7 +30,7 @@ EOF
   install_file "$CONFIG_DIR/files/gnome/settings.dconf" "$DCONF_DIR/00-arch-setup"
   if ((FILE_CHANGED)); then dconf_changed=1; fi
 
-  log_step "Atajos de teclado"
+  log_step "Keyboard shortcuts"
   keyfile="$RUN_TMPDIR/keybindings.dconf"
   _keybindings_keyfile "$CONFIG_DIR/files/gnome/keybindings.list" >"$keyfile"
   install_file "$keyfile" "$DCONF_DIR/10-arch-setup-keybindings"

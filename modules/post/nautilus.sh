@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# desc: Nautilus: extras, carpetas XDG (sin Plantillas ni Público), marcadores y Samba
+# desc: Nautilus: extras, carpetas XDG (sin Templates ni Public), bookmarks y Samba
 #
 # Ver ArchLinux2/nautilus.md.
 
@@ -11,7 +11,7 @@ module_run() {
   log_step "Paquetes"
   install_list "$CONFIG_DIR/packages/nautilus.list"
 
-  log_step "Carpetas XDG (sin Plantillas ni Público)"
+  log_step "Carpetas XDG (sin Templates ni Public)"
   # Sin user-dirs.dirs, xdg-user-dir responde "$HOME" para todo y el primer
   # inicio de sesión crearía todas las carpetas: se genera ya para editarlo.
   dirs="$home/.config/user-dirs.dirs"
@@ -31,7 +31,7 @@ module_run() {
     fi
   done
 
-  log_step "Marcadores: Descargas, Imágenes, Documentos y File System"
+  log_step "Bookmarks: Downloads, Pictures, Documents y File System"
   bookmarks="$home/.config/gtk-3.0/bookmarks"
   for d in DOWNLOAD PICTURES DOCUMENTS; do
     path=$(runuser -u "$user" -- env HOME="$home" xdg-user-dir "$d")
