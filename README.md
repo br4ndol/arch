@@ -48,7 +48,7 @@ Las dos fases están completas y probadas desde cero en una VM de VirtualBox (UE
 | `users` | Crea el usuario en `wheel` con sudo, y pone la misma contraseña al usuario y a root |
 | `repo` | Deja una copia del repo en `~/arch` (con tus respuestas, menos el hash de la contraseña) para ejecutar `post.sh` nada más arrancar |
 | `network` | NetworkManager con iwd |
-| `boot` | Cmdline, UKI principal y de respaldo con sus entradas EFI, y la copia `BOOTX64.EFI` |
+| `boot` | Cmdline, UKI principal y de respaldo con sus entradas EFI, y, solo en una VM, la copia `BOOTX64.EFI` |
 
 ### `post.sh` (en el sistema instalado)
 
@@ -124,7 +124,7 @@ Al terminar, desmonta con `umount -R /mnt`, quita la ISO y reinicia. El repo que
 
 También se genera un **UKI de respaldo** (`arch-linux-cachyos-bore-fallback.efi`, con todos los módulos y sin `autodetect`) con su propia entrada, "Arch Linux (cachyos-bore fallback)". Elígela en el menú de arranque del firmware si un cambio en `MODULES` o en el cmdline rompe el principal.
 
-Además hay una copia del UKI principal en la ruta de respaldo UEFI `\EFI\BOOT\BOOTX64.EFI`. El firmware la arranca si pierde la entrada (al resetear la BIOS, al actualizar el firmware o en VirtualBox, que las olvida). Un post hook de mkinitcpio (`/etc/initcpio/post/arch-setup-uki-fallback`) la actualiza cada vez que se regenera el UKI.
+**Solo en una máquina virtual** se deja además una copia del UKI principal en la ruta de respaldo UEFI `\EFI\BOOT\BOOTX64.EFI`, porque VirtualBox olvida las entradas EFI. Un post hook de mkinitcpio (`/etc/initcpio/post/arch-setup-uki-fallback`) la actualiza cada vez que se regenera el UKI. En hardware real no se crea: el firmware del portátil añadiría por su cuenta una tercera entrada "UEFI OS" para esa ruta. Si alguna vez se pierden las entradas (reset de la BIOS), se recrean desde la ISO con `efibootmgr` o repitiendo el módulo `boot`.
 
 ## Uso en el sistema instalado
 

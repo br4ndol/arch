@@ -3,10 +3,11 @@
 #
 # Ver ArchLinux2/kernel.md. Sin bootloader: el firmware arranca el UKI.
 #
-# Genera dos UKI (preset con 'default' y 'fallback', cada uno con su entrada EFI)
-# y deja una copia del principal en la ruta de respaldo UEFI
-# (\EFI\BOOT\BOOTX64.EFI), que el firmware arranca si pierde las entradas. Un
-# post hook de mkinitcpio mantiene esa copia al día en cada actualización.
+# Genera dos UKI (preset con 'default' y 'fallback', cada uno con su entrada EFI).
+# Solo en una máquina virtual deja además una copia del principal en la ruta de
+# respaldo UEFI (\EFI\BOOT\BOOTX64.EFI), porque VirtualBox olvida las entradas;
+# un post hook de mkinitcpio la mantiene al día. En hardware real no: el
+# firmware (ASUS/AMI) crea solo una tercera entrada "UEFI OS" para esa ruta.
 
 POST_HOOK=/etc/initcpio/post/arch-setup-uki-fallback
 BOOTX64=/efi/EFI/BOOT/BOOTX64.EFI
@@ -29,9 +30,13 @@ module_run() {
   ((FILE_CHANGED)) && rebuild=1
   [[ -d /efi/EFI/Linux ]] || run mkdir -p /efi/EFI/Linux
 
-  log_step "Copia de respaldo en \\EFI\\BOOT\\BOOTX64.EFI"
-  # Se instala antes de generar el UKI: mkinitcpio la mantiene al día desde ahora.
-  render_template "$CONFIG_DIR/files/uki-fallback.hook" "$POST_HOOK" 755
+  log_step "Copia de respaldo en \\EFI\\BOOT\\BOOTX64.EFI (solo en VM)"
+  if systemd-detect-virt --quiet --vm; then
+    # Se instala antes de generar el UKI: mkinitcpio la mantiene al día desde ahora.
+    render_template "$CONFIG_DIR/files/uki-fallback.hook" "$POST_HOOK" 755
+  else
+    _remove_bootx64
+  fi
 
   log_step "UKI principal y de respaldo"
   if ((rebuild)) || [[ ! -f $uki || ! -f $uki_fb ]]; then
@@ -46,7 +51,7 @@ module_run() {
   done
 
   # Por si el UKI ya existía y no se regeneró (el hook solo actúa al regenerar).
-  if [[ -f $uki ]] && ! same_content "$uki" "$BOOTX64"; then
+  if [[ -f $POST_HOOK && -f $uki ]] && ! same_content "$uki" "$BOOTX64"; then
     run mkdir -p -- "${BOOTX64%/*}"
     run cp -f -- "$uki" "$BOOTX64"
     log_ok "Copiado a $BOOTX64"
@@ -56,6 +61,31 @@ module_run() {
   # efibootmgr pone la última creada al principio: la principal va al final.
   _ensure_uefi_entry "Arch Linux (${KERNEL#linux-} fallback)" "\\EFI\\Linux\\arch-$KERNEL-fallback.efi"
   _ensure_uefi_entry "Arch Linux (${KERNEL#linux-})" "\\EFI\\Linux\\arch-$KERNEL.efi"
+}
+
+# _remove_bootx64 — En hardware real: quita el hook y la copia si los puso una
+# versión anterior (la ESP la formatea el script, así que BOOTX64.EFI es nuestro).
+_remove_bootx64() {
+  local partuuid entries n
+  if [[ -f $POST_HOOK ]]; then run rm -f -- "$POST_HOOK"; fi
+  if [[ -f $BOOTX64 ]]; then
+    run rm -f -- "$BOOTX64"
+    run rmdir --ignore-fail-on-non-empty -- "${BOOTX64%/*}"
+    log_ok "Quitado $BOOTX64"
+  else
+    log_ok "Hardware real: no hace falta"
+  fi
+  # La entrada "UEFI OS" que el firmware creó para esa ruta sigue en la NVRAM
+  # aunque se reinstale (formatear no cambia el PARTUUID): se borra también.
+  partuuid=$(lsblk -no PARTUUID "$(findmnt -no SOURCE /efi)")
+  entries=$(efibootmgr -v 2>/dev/null | awk -v p="${partuuid,,}" \
+    'tolower($0) ~ /\\efi\\boot\\bootx64\.efi/ && index(tolower($0), p) { print substr($1, 5, 4) }') || entries=''
+  while read -r n; do
+    if [[ -n $n ]]; then
+      run efibootmgr -q -b "$n" -B
+      log_ok "Borrada la entrada Boot$n (UEFI OS -> BOOTX64.EFI)"
+    fi
+  done <<<"$entries"
 }
 
 # _ensure_uefi_entry ETIQUETA LOADER — Crea la entrada si no existe una con esa
